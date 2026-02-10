@@ -16,6 +16,7 @@ const Register = () => {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  console.log(error)
 
   const handleChange = (e) => {
     setFormData({
@@ -54,29 +55,31 @@ const Register = () => {
       // 3. Redirect to login
       navigate("/login");
     } catch (err) {
-      setError(err.message);
+      if (err.code === "auth/email-already-in-use") {
+    setError("This email is already registered. Please sign in.");
+  } else if (err.code === "auth/invalid-email") {
+    setError("Please enter a valid email address.");
+  } else if (err.code === "auth/weak-password") {
+    setError("Password should be at least 6 characters.");
+  } else {
+    setError("Something went wrong. Please try again.");
+  }
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 font-sans relative z-10">
+    <div className="min-h-screen flex items-center justify-center py-5 px-4 sm:px-6 lg:px-8 font-sans relative z-10">
       <div className="max-w-md w-full space-y-8 bg-card-bg backdrop-blur-xl p-8 rounded-2xl shadow-glow border border-border-dim animate-slide-up">
         <div className="text-center">
           <h1 className="text-3xl font-extrabold text-text-main tracking-tight">Create Account</h1>
           <p className="mt-2 text-text-dim text-sm">Join JobPortal and start your journey</p>
         </div>
 
-        {error && (
-          <div className="bg-red-500/10 border-l-4 border-red-500 p-4 rounded text-sm text-red-400 animate-pulse">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-3">
           <div className="form-group text-center">
-            <label className="block text-sm font-semibold text-text-dim mb-2 text-left">I am a...</label>
+            <label className="block text-sm font-semibold text-text-dim mb-2 text-center">I am a...</label>
             <div className="grid grid-cols-2 gap-4">
               <div
                 className={`flex flex-col items-center p-4 rounded-xl cursor-pointer transition-all duration-300 border-2 ${
@@ -152,6 +155,11 @@ const Register = () => {
           >
             {loading ? 'Creating account...' : 'Create Account'}
           </button>
+           {error && (
+          <div className="bg-red-500/10 border-l-4 border-red-500 p-4 rounded text-sm text-red-400 animate-pulse">
+            {error}
+          </div>
+        )}
         </form>
 
         <div className="text-center text-text-dim text-sm mt-8">
