@@ -7,7 +7,7 @@ const HeroSection = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-[85vh] relative pt-24 pb-16 sm:pt-40 sm:pb-24 overflow-x-hidden flex items-center">
+    <div className="min-h-[85vh] relative pt-24 pb-16 sm:pt-40 sm:pb-24 overflow-hidden flex items-center">
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10">
         <h1 className="text-5xl sm:text-7xl font-extrabold tracking-tight mb-8 animate-slide-up">
           <span className="block text-text-main">Find Your Dream Job</span>
