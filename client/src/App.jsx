@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Landing from './pages/Landing.jsx'
 import Login from './pages/Login.jsx'
 import Register from './pages/Register.jsx'
-import CandidateDashboard from './pages/CandidateDashboard.jsx'
+import CandidateDashboard from './pages/candidate/CandidateDashboard.jsx'
 import EmployerDashboard from './pages/EmployerDashboard.jsx'
 import AdminDashboard from './pages/AdminDashboard.jsx'
 
