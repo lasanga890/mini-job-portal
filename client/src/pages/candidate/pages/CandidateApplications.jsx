@@ -6,7 +6,7 @@ import Card from '../../../components/common/Card';
 import Button from '../../../components/common/Button';
 
 // Mock data helper (replace with actual API call later)
-const getMyApplications = async (token) => {
+const getMyApplications = async () => {
   return [
     { _id: '1', job: { title: 'Frontend Developer', employer: { companyName: 'TechCorp' }, location: 'Remote' }, status: 'pending', message: 'Looking forward to hearing back!', createdAt: '2024-02-10', cvUrl: '/cvs/frontend.pdf' },
     { _id: '2', job: { title: 'React Engineer', employer: { companyName: 'WebSolutions' }, location: 'New York, NY' }, status: 'shortlisted', message: '', createdAt: '2024-02-08', cvUrl: '/cvs/react.pdf' },
@@ -31,8 +31,7 @@ function CandidateApplications() {
     }
     const loadApps = async () => {
       try {
-        const token = 'mock-token'; // Replace with actual token
-        const data = await getMyApplications(token);
+        const data = await getMyApplications();
         setApplications(data);
       } catch (err) {
         console.error(err);
@@ -156,7 +155,7 @@ function CandidateApplications() {
                   <Button 
                     variant="secondary" 
                     size="sm"
-                    className="!py-1.5 !px-3 !text-xs"
+                    className="py-1.5! px-3! text-xs!"
                     onClick={() => window.open(`http://localhost:5000${app.cvUrl}`, '_blank')}
                   >
                     📄 View CV

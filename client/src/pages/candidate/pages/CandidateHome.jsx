@@ -7,7 +7,7 @@ import JobCard from '../../../components/common/JobCard';
 import Button from '../../../components/common/Button';
 
 // Mock data helpers (replace with actual API calls later)
-const getMyApplications = async (token) => {
+const getMyApplications = async () => {
   return [
     { _id: '1', job: { title: 'Frontend Developer', employer: { companyName: 'TechCorp' } }, status: 'pending', createdAt: '2024-02-10' },
     { _id: '2', job: { title: 'React Engineer', employer: { companyName: 'WebSolutions' } }, status: 'shortlisted', createdAt: '2024-02-08' },
@@ -16,7 +16,7 @@ const getMyApplications = async (token) => {
   ];
 };
 
-const getJobs = async ({ limit }) => {
+const getJobs = async () => {
   return {
     jobs: [
         {
@@ -75,11 +75,9 @@ function CandidateHome() {
     
     const loadData = async () => {
       try {
-        // Mock token for now
-        const token = 'mock-token'; 
         const [apps, jobsData] = await Promise.all([
-          getMyApplications(token),
-          getJobs({ limit: 4 }),
+          getMyApplications(),
+          getJobs(),
         ]);
         setApplications(apps);
         setRecentJobs(jobsData.jobs);
