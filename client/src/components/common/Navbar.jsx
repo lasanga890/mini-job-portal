@@ -73,7 +73,7 @@ const Navbar = () => {
          
         
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity" onClick={() => navigate('/candidate/profile')}>
             <div className="w-8 h-8 rounded-full bg-accent-purple flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-accent-purple/20">
               {user.name?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase()}
             </div>
@@ -139,7 +139,7 @@ const Navbar = () => {
         
         <div className="w-full h-px bg-white/10 my-2"></div>
 
-        <div className="flex flex-col items-center gap-2 mb-2">
+        <div className="flex flex-col items-center gap-2 mb-2 cursor-pointer" onClick={() => { navigate('/candidate/profile'); setIsMobileMenuOpen(false); }}>
           <div className="w-12 h-12 rounded-full bg-accent-purple flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-accent-purple/20">
             {user.name?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase()}
           </div>

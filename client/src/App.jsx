@@ -6,6 +6,7 @@ import Register from './pages/Register.jsx'
 import CandidateDashboard from './pages/candidate/CandidateDashboard.jsx'
 import CandidateHome from './pages/candidate/pages/CandidateHome.jsx'
 import CandidateApplications from './pages/candidate/pages/CandidateApplications.jsx'
+import CandidateProfile from './pages/candidate/pages/CandidateProfile.jsx'
 import EmployerDashboard from './pages/EmployerDashboard.jsx'
 import AdminDashboard from './pages/AdminDashboard.jsx'
 
@@ -31,6 +32,7 @@ function App() {
           <Route index element={<Navigate to="home" replace />} />
           <Route path="home" element={<CandidateHome />} />
           <Route path="applications" element={<CandidateApplications />} />
+          <Route path="profile" element={<CandidateProfile />} />
         </Route>
         <Route 
           path="/employer" 
