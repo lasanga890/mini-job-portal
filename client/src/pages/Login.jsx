@@ -8,7 +8,7 @@ import { useAuth } from "../context/AuthContext";
 const Login = () => {
   const navigate = useNavigate();
   const { user, role } = useAuth();
-
+console.log(role)
   const [formData, setFormData] = useState({
     email: "",
     password: ""
@@ -49,6 +49,7 @@ const Login = () => {
   // 🔥 ROLE-BASED REDIRECTION
   useEffect(() => {
     if (user && role) {
+      console.log(role)
       if (role === "candidate") {
         navigate("/candidate");
       } else if (role === "employer") {
