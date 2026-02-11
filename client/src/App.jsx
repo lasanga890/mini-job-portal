@@ -7,7 +7,8 @@ import CandidateDashboard from './pages/candidate/CandidateDashboard.jsx'
 import CandidateHome from './pages/candidate/pages/CandidateHome.jsx'
 import CandidateApplications from './pages/candidate/pages/CandidateApplications.jsx'
 import CandidateProfile from './pages/candidate/pages/CandidateProfile.jsx'
-import EmployerDashboard from './pages/EmployerDashboard.jsx'
+import EmployerDashboard from './pages/employer/EmployerDashboard.jsx'
+import EmployerHome from './pages/employer/pages/EmployerHome.jsx'
 import AdminDashboard from './pages/AdminDashboard.jsx'
 
 import ProtectedRoute from './routes/ProtectedRoute.jsx'
@@ -35,13 +36,19 @@ function App() {
           <Route path="profile" element={<CandidateProfile />} />
         </Route>
         <Route 
-          path="/employer" 
+          path="/employer/*" 
           element={
             <ProtectedRoute allowedRole="employer">
               <EmployerDashboard />
             </ProtectedRoute>
           } 
-        />
+        >
+          <Route index element={<Navigate to="home" replace />} />
+          <Route path="home" element={<EmployerHome />} />
+          <Route path="post-job" />
+          <Route path="my-jobs" />
+          <Route path="profile" />
+        </Route>
         <Route 
           path="/admin" 
           element={

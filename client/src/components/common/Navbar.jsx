@@ -64,16 +64,21 @@ const Navbar = () => {
         
         {role === 'employer' && (
           <>
+            <span onClick={() => navigate('/employer')} className={getLinkClass('/employer')}>Home</span>
             <span onClick={() => navigate('/employer/post-job')} className={getLinkClass('/employer/post-job')}>Post Job</span>
-            <span onClick={() => navigate('/employer/dashboard')} className={getLinkClass('/employer/dashboard')}>Dashboard</span>
+            <span onClick={() => navigate('/employer/my-jobs')} className={getLinkClass('/employer/my-jobs')}>My Jobs</span>
           </>
+        )}
+
+        {role === 'admin' && (
+          <span onClick={() => navigate('/admin')} className={getLinkClass('/admin')}>Dashboard</span>
         )}
 
         <div className="h-6 w-px bg-white/10 mx-2"></div>
          
         
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity" onClick={() => navigate('/candidate/profile')}>
+          <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity" onClick={() => navigate(`/${role}/profile`)}>
             <div className="w-8 h-8 rounded-full bg-accent-purple flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-accent-purple/20">
               {user.name?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase()}
             </div>
@@ -132,14 +137,19 @@ const Navbar = () => {
 
         {role === 'employer' && (
           <>
+             <span onClick={() => { navigate('/employer'); setIsMobileMenuOpen(false); }} className={`text-lg ${getLinkClass('/employer')}`}>Home</span>
              <span onClick={() => { navigate('/employer/post-job'); setIsMobileMenuOpen(false); }} className={`text-lg ${getLinkClass('/employer/post-job')}`}>Post Job</span>
-             <span onClick={() => { navigate('/employer/dashboard'); setIsMobileMenuOpen(false); }} className={`text-lg ${getLinkClass('/employer/dashboard')}`}>Dashboard</span>
+             <span onClick={() => { navigate('/employer/my-jobs'); setIsMobileMenuOpen(false); }} className={`text-lg ${getLinkClass('/employer/my-jobs')}`}>My Jobs</span>
           </>
+        )}
+
+        {role === 'admin' && (
+          <span onClick={() => { navigate('/admin'); setIsMobileMenuOpen(false); }} className={`text-lg ${getLinkClass('/admin')}`}>Dashboard</span>
         )}
         
         <div className="w-full h-px bg-white/10 my-2"></div>
 
-        <div className="flex flex-col items-center gap-2 mb-2 cursor-pointer" onClick={() => { navigate('/candidate/profile'); setIsMobileMenuOpen(false); }}>
+        <div className="flex flex-col items-center gap-2 mb-2 cursor-pointer" onClick={() => { navigate(`/${role}/profile`); setIsMobileMenuOpen(false); }}>
           <div className="w-12 h-12 rounded-full bg-accent-purple flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-accent-purple/20">
             {user.name?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase()}
           </div>
