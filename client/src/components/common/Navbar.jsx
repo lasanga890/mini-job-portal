@@ -57,14 +57,14 @@ const Navbar = () => {
       <div className="hidden md:flex items-center gap-6">
         {role === 'candidate' && (
           <>
-            <span onClick={() => navigate('/candidate')} className={getLinkClass('/candidate')}>Home</span>
+            <span onClick={() => navigate('/candidate/home')} className={getLinkClass('/candidate/home')}>Home</span>
             <span onClick={() => navigate('/candidate/applications')} className={getLinkClass('/candidate/applications')}>My Applications</span>
           </>
         )}
         
         {role === 'employer' && (
           <>
-            <span onClick={() => navigate('/employer')} className={getLinkClass('/employer')}>Home</span>
+            <span onClick={() => navigate('/employer/home')} className={getLinkClass('/employer/home')}>Home</span>
             <span onClick={() => navigate('/employer/post-job')} className={getLinkClass('/employer/post-job')}>Post Job</span>
             <span onClick={() => navigate('/employer/my-jobs')} className={getLinkClass('/employer/my-jobs')}>My Jobs</span>
           </>
@@ -137,7 +137,7 @@ const Navbar = () => {
 
         {role === 'employer' && (
           <>
-             <span onClick={() => { navigate('/employer'); setIsMobileMenuOpen(false); }} className={`text-lg ${getLinkClass('/employer')}`}>Home</span>
+             <span onClick={() => { navigate('/employer/home'); setIsMobileMenuOpen(false); }} className={`text-lg ${getLinkClass('/employer/home')}`}>Home</span>
              <span onClick={() => { navigate('/employer/post-job'); setIsMobileMenuOpen(false); }} className={`text-lg ${getLinkClass('/employer/post-job')}`}>Post Job</span>
              <span onClick={() => { navigate('/employer/my-jobs'); setIsMobileMenuOpen(false); }} className={`text-lg ${getLinkClass('/employer/my-jobs')}`}>My Jobs</span>
           </>

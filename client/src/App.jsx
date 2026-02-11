@@ -9,6 +9,8 @@ import CandidateApplications from './pages/candidate/pages/CandidateApplications
 import CandidateProfile from './pages/candidate/pages/CandidateProfile.jsx'
 import EmployerDashboard from './pages/employer/EmployerDashboard.jsx'
 import EmployerHome from './pages/employer/pages/EmployerHome.jsx'
+import JobPost from './pages/employer/pages/JobPost.jsx'
+import MyJobs from './pages/employer/pages/MyJobs.jsx'
 import AdminDashboard from './pages/AdminDashboard.jsx'
 
 import ProtectedRoute from './routes/ProtectedRoute.jsx'
@@ -45,9 +47,10 @@ function App() {
         >
           <Route index element={<Navigate to="home" replace />} />
           <Route path="home" element={<EmployerHome />} />
-          <Route path="post-job" />
-          <Route path="my-jobs" />
-          <Route path="profile" />
+          <Route path="post-job" element={<JobPost />} />
+          <Route path="edit-job/:jobId" element={<JobPost />} />
+          <Route path="my-jobs" element={<MyJobs />} />
+          <Route path="profile" element={<div>Employer Profile Page (Coming Soon)</div>} />
         </Route>
         <Route 
           path="/admin" 

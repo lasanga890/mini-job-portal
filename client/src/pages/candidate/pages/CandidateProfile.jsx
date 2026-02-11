@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
 import Card from '../../../components/common/Card';
 import Button from '../../../components/common/Button';
+import Loading from '../../../components/common/Loading';
 import { getCandidateProfile, updateCandidateProfile, uploadCV } from '../../../services/candidateService';
 
 const CandidateProfile = () => {
@@ -91,25 +92,7 @@ const CandidateProfile = () => {
   };
 
   if (authLoading || loading) {
-     return (
-        <div className="min-h-screen flex items-center justify-center bg-primary-bg p-4">
-          <div className="w-full max-w-sm rounded-2xl border border-border-dim bg-card-bg backdrop-blur-xl p-8 shadow-glow">
-            <div className="flex animate-pulse space-x-4">
-              <div className="size-12 rounded-full bg-white/10"></div>
-              <div className="flex-1 space-y-6 py-1">
-                <div className="h-3 rounded-full bg-white/10 w-3/4"></div>
-                <div className="space-y-3">
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="col-span-2 h-3 rounded-full bg-white/10"></div>
-                    <div className="col-span-1 h-3 rounded-full bg-white/10"></div>
-                  </div>
-                  <div className="h-3 rounded-full bg-white/10"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      );
+     return <Loading />;
   }
 
   return (
