@@ -4,8 +4,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
 import { createJob, getJobById, updateJob } from '../../../services/jobService';
 import Card from '../../../components/common/Card';
-import Button from '../../../components/common/Button';
 import Loading from '../../../components/common/Loading';
+import JobForm from '../../../components/employer/JobForm';
 
 const JobPost = () => {
   const { user, loading: authLoading } = useAuth();
@@ -13,14 +13,7 @@ const JobPost = () => {
   const navigate = useNavigate();
   const isEditMode = !!jobId;
 
-  const [form, setForm] = useState({
-    title: '',
-    description: '',
-    location: '',
-    type: 'Full-time',
-    salary: '',
-  });
-
+  const [jobData, setJobData] = useState(null);
   const [loading, setLoading] = useState(isEditMode);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -36,20 +29,14 @@ const JobPost = () => {
     if (isEditMode) {
       const fetchJob = async () => {
         try {
-          const jobData = await getJobById(jobId);
-          if (jobData) {
-            // Security check: ensure this job belongs to the logged-in employer
-            if (jobData.employerId !== user.uid) {
+          const data = await getJobById(jobId);
+          if (data) {
+            // Security check
+            if (data.employerId !== user.uid) {
               navigate('/employer/home');
               return;
             }
-            setForm({
-              title: jobData.title || '',
-              description: jobData.description || '',
-              location: jobData.location || '',
-              type: jobData.type || 'Full-time',
-              salary: jobData.salary || '',
-            });
+            setJobData(data);
           }
         } catch (err) {
           console.error("Error fetching job:", err);
@@ -62,36 +49,26 @@ const JobPost = () => {
     }
   }, [user, authLoading, jobId, isEditMode, navigate]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleFormSubmit = async (formData) => {
     setSaving(true);
     setError('');
     setSuccess('');
 
     try {
       if (isEditMode) {
-        await updateJob(jobId, form);
+        await updateJob(jobId, formData);
         setSuccess('Job updated successfully!');
       } else {
         await createJob(user.uid, {
-            ...form,
-            employerName: user.name || user.displayName || 'Company Name', // Cached for listing
+            ...formData,
+            employerName: user.name || user.displayName || 'Company Name',
         });
         setSuccess('Job posted successfully!');
-        // Reset form after successful post
-        setForm({
-            title: '',
-            description: '',
-            location: '',
-            type: 'Full-time',
-            salary: '',
-        });
       }
       
-      // Navigate back after a short delay
       setTimeout(() => {
           navigate('/employer/my-jobs');
-      }, 2000);
+      }, 1500);
 
     } catch (err) {
       setError(err.message || 'Failed to save job.');
@@ -132,81 +109,12 @@ const JobPost = () => {
         )}
 
         <Card className="p-8 animate-slide-up">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-text-dim ml-1">Job Title</label>
-              <input 
-                type="text" 
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-accent-purple focus:ring-1 focus:ring-accent-purple transition-all placeholder:text-white/20"
-                placeholder="e.g. Senior Software Engineer"
-                value={form.title}
-                onChange={(e) => setForm({ ...form, title: e.target.value })} 
-                required 
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                    <label className="block text-sm font-medium text-text-dim ml-1">Location</label>
-                    <input 
-                        type="text" 
-                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-accent-purple focus:ring-1 focus:ring-accent-purple transition-all placeholder:text-white/20"
-                        placeholder="e.g. Remote or City, Country" 
-                        value={form.location}
-                        onChange={(e) => setForm({ ...form, location: e.target.value })} 
-                        required
-                    />
-                </div>
-                <div className="space-y-2">
-                    <label className="block text-sm font-medium text-text-dim ml-1">Job Type</label>
-                    <select 
-                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-accent-purple focus:ring-1 focus:ring-accent-purple transition-all"
-                        value={form.type}
-                        onChange={(e) => setForm({ ...form, type: e.target.value })}
-                    >
-                        <option value="Full-time" className="bg-primary-bg text-white">Full-time</option>
-                        <option value="Internship" className="bg-primary-bg text-white">Internship</option>
-                        <option value="Part-time" className="bg-primary-bg text-white">Part-time</option>
-                        <option value="Contract" className="bg-primary-bg text-white">Contract</option>
-                    </select>
-                </div>
-            </div>
-
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-text-dim ml-1">Salary Range (Optional)</label>
-              <input 
-                type="text" 
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-accent-purple focus:ring-1 focus:ring-accent-purple transition-all placeholder:text-white/20"
-                placeholder="e.g. $100k - $120k / year"
-                value={form.salary}
-                onChange={(e) => setForm({ ...form, salary: e.target.value })} 
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-text-dim ml-1">Job Description</label>
-              <textarea 
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-accent-purple focus:ring-1 focus:ring-accent-purple transition-all h-64 resize-none placeholder:text-white/20"
-                placeholder="Describe the role, responsibilities, and requirements..."
-                value={form.description} 
-                onChange={(e) => setForm({ ...form, description: e.target.value })} 
-                required
-              />
-            </div>
-
-            <div className="pt-4">
-              <Button 
-                type="submit" 
-                variant="primary" 
-                size="lg" 
-                className="w-full shadow-accent-purple/40 font-bold"
-                loading={saving}
-                disabled={saving}
-              >
-                {isEditMode ? 'Update Job Listing' : 'Post Job Now'}
-              </Button>
-            </div>
-          </form>
+          <JobForm 
+            key={jobData?.id || 'new'}
+            initialData={jobData}
+            onSubmit={handleFormSubmit}
+            isSaving={saving}
+          />
         </Card>
       </div>
     </div>

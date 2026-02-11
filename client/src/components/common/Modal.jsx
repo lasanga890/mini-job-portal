@@ -28,7 +28,7 @@ const Modal = ({ isOpen, onClose, title, children, footer }) => {
       <div className="relative w-full max-w-2xl bg-card-bg/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl animate-in zoom-in-95 duration-200">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-white/5">
-          <h2 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-text-dim">
+          <h2 className="text-xl font-bold bg-clip-text text-transparent bg-linear-to-r from-white to-text-dim">
             {title}
           </h2>
           <button 

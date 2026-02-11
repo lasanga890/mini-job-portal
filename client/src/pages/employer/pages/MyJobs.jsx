@@ -2,10 +2,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
-import { getEmployerJobs, deleteJob } from '../../../services/jobService';
+import { getEmployerJobs, deleteJob, updateJob } from '../../../services/jobService';
 import Card from '../../../components/common/Card';
 import Button from '../../../components/common/Button';
 import Loading from '../../../components/common/Loading';
+import Modal from '../../../components/common/Modal';
+import JobForm from '../../../components/employer/JobForm';
 
 const MyJobs = () => {
   const { user, loading: authLoading } = useAuth();
@@ -14,11 +16,16 @@ const MyJobs = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  // Modal states
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedJob, setSelectedJob] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
+
   useEffect(() => {
     const fetchJobs = async () => {
       try {
         const data = await getEmployerJobs(user.uid);
-        console.log(user.uid)
         setJobs(data);
       } catch (err) {
         console.error(err);
@@ -36,15 +43,43 @@ const MyJobs = () => {
     fetchJobs();
   }, [user, authLoading, navigate]);
 
-  const handleDelete = async (jobId) => {
-    if (window.confirm("Are you sure you want to delete this job posting?")) {
-      try {
-        await deleteJob(jobId);
-        setJobs(jobs.filter(job => job.id !== jobId));
-      } catch (error) {
-        console.error("Delete error:", error);
-        alert("Failed to delete job.");
-      }
+  const handleDeleteClick = (job) => {
+    setSelectedJob(job);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleEditClick = (job) => {
+    setSelectedJob(job);
+    setIsEditModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    setIsSaving(true);
+    try {
+      await deleteJob(selectedJob.id);
+      setJobs(jobs.filter(job => job.id !== selectedJob.id));
+      setIsDeleteModalOpen(false);
+    } catch (err) {
+      console.error("Delete error:", err);
+      alert("Failed to delete job.");
+    } finally {
+      setIsSaving(false);
+      setSelectedJob(null);
+    }
+  };
+
+  const handleUpdateJob = async (formData) => {
+    setIsSaving(true);
+    try {
+      await updateJob(selectedJob.id, formData);
+      setJobs(jobs.map(job => job.id === selectedJob.id ? { ...job, ...formData } : job));
+      setIsEditModalOpen(false);
+    } catch (err) {
+      console.error("Update error:", err);
+      alert("Failed to update job.");
+    } finally {
+      setIsSaving(false);
+      setSelectedJob(null);
     }
   };
 
@@ -81,34 +116,49 @@ const MyJobs = () => {
             {jobs.map(job => (
               <Card key={job.id} className="p-6 hover:border-white/20 transition-all group">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  <div className="space-y-1">
+                  <div className="space-y-3 flex-1">
                     <h3 className="text-xl font-bold text-white group-hover:text-accent-purple transition-colors">
                       {job.title}
                     </h3>
-                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-text-dim">
+                    {/* <p className="text-sm text-text-dim  bg-white/5 p-3 rounded-lg border border-white/5">
                         {job.description}
-                    </div>
-                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-text-dim">
-                      <span>📍 {job.location}</span>
-                      <span>💼 {job.type}</span>
-                      {job.salary && <span>💰 {job.salary}</span>}
-                      <span>📅 {job.createdAt?.toDate().toLocaleDateString() || 'Recently'}</span>
+                    </p> */}
+                    <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm text-text-dim/80">
+                      <span className="flex items-center gap-1.5">
+                        <svg className="w-4 h-4 text-accent-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                        {job.location}
+                      </span>
+                      <span className="flex items-center gap-1.5">
+                        <svg className="w-4 h-4 text-accent-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                        {job.type}
+                      </span>
+                      {job.salary && (
+                        <span className="flex items-center gap-1.5">
+                          <svg className="w-4 h-4 text-accent-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 1.343-3 3s1.343 3 3 3 3-1.343 3-3-1.343-3-3-3zM12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2z" /></svg>
+                          {job.salary}
+                        </span>
+                      )}
+                      <span className="flex items-center gap-1.5 opacity-60">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2v12a2 2 0 002 2z" /></svg>
+                        {job.createdAt?.toDate().toLocaleDateString()}
+                      </span>
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-row md:flex-col items-center gap-2">
                     <Button 
                         variant="secondary" 
                         size="sm"
-                        onClick={() => navigate(`/employer/edit-job/${job.id}`)}
+                        className="w-full md:w-24"
+                        onClick={() => handleEditClick(job)}
                     >
                       Edit
                     </Button>
                     <Button 
                         variant="outline" 
                         size="sm"
-                        className="border-red-500/50 text-red-500 hover:bg-red-500/10 hover:border-red-500"
-                        onClick={() => handleDelete(job.id)}
+                        className="w-full md:w-24 border-red-500/30 text-red-500 hover:bg-red-500/10 hover:border-red-500 transition-all font-medium"
+                        onClick={() => handleDeleteClick(job)}
                     >
                       Delete
                     </Button>
@@ -118,9 +168,65 @@ const MyJobs = () => {
             ))}
           </div>
         )}
+
+        {/* Edit Modal */}
+        <Modal
+          isOpen={isEditModalOpen}
+          onClose={() => { setIsEditModalOpen(false); setSelectedJob(null); }}
+          title="Edit Job Posting"
+        >
+          <JobForm 
+            key={selectedJob?.id}
+            initialData={selectedJob} 
+            onSubmit={handleUpdateJob}
+            onCancel={() => { setIsEditModalOpen(false); setSelectedJob(null); }}
+            isSaving={isSaving}
+          />
+        </Modal>
+
+        {/* Delete Modal */}
+        <Modal
+          isOpen={isDeleteModalOpen}
+          onClose={() => { setIsDeleteModalOpen(false); setSelectedJob(null); }}
+          title="Delete Job Posting"
+          footer={
+            <>
+              <Button 
+                variant="secondary" 
+                onClick={() => { setIsDeleteModalOpen(false); setSelectedJob(null); }}
+              >
+                Cancel
+              </Button>
+              <Button 
+                variant="primary" 
+                className="bg-red-500 shadow-red-500/30 hover:bg-red-600 border-none"
+                onClick={confirmDelete}
+                loading={isSaving}
+              >
+                Confirm Delete
+              </Button>
+            </>
+          }
+        >
+          <div className="space-y-4">
+            <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto text-red-500">
+              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <div className="text-center">
+              <p className="text-white text-lg font-semibold">Are you sure?</p>
+              <p className="text-text-dim mt-1">
+                You are about to delete <span className="text-white font-medium">"{selectedJob?.title}"</span>. 
+                This action cannot be undone.
+              </p>
+            </div>
+          </div>
+        </Modal>
       </div>
     </div>
   );
 };
 
 export default MyJobs;
+
