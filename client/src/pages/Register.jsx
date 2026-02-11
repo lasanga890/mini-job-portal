@@ -2,7 +2,7 @@ import { useState } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { auth, db } from "../firebase/firebaseConfig";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -71,7 +71,7 @@ const Register = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center py-5 px-4 sm:px-6 lg:px-8 font-sans relative z-10">
-      <div className="max-w-md w-full space-y-8 bg-card-bg backdrop-blur-xl p-8 rounded-2xl shadow-glow border border-border-dim animate-slide-up">
+      <div className="max-w-md w-full space-y-2 bg-card-bg backdrop-blur-xl p-8 rounded-2xl shadow-glow border border-border-dim animate-slide-up">
         <div className="text-center">
           <h1 className="text-3xl font-extrabold text-text-main tracking-tight">Create Account</h1>
           <p className="mt-2 text-text-dim text-sm">Join JobPortal and start your journey</p>
@@ -163,8 +163,14 @@ const Register = () => {
         </form>
 
         <div className="text-center text-text-dim text-sm mt-8">
-          Already have an account? <Link to="/login" className="text-accent-light font-bold hover:underline ml-1 transition-colors">Sign in</Link>
-        </div>
+  Already have an account? 
+  <span 
+    onClick={() => navigate("/login")} 
+    className="text-accent-light font-bold hover:underline ml-1 transition-colors cursor-pointer"
+  >
+    Sign in
+  </span>
+</div>
       </div>
     </div>
   );
