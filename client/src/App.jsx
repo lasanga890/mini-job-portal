@@ -1,9 +1,11 @@
 import './App.css'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Landing from './pages/Landing.jsx'
 import Login from './pages/Login.jsx'
 import Register from './pages/Register.jsx'
 import CandidateDashboard from './pages/candidate/CandidateDashboard.jsx'
+import CandidateHome from './pages/candidate/pages/CandidateHome.jsx'
+import CandidateApplications from './pages/candidate/pages/CandidateApplications.jsx'
 import EmployerDashboard from './pages/EmployerDashboard.jsx'
 import AdminDashboard from './pages/AdminDashboard.jsx'
 
@@ -19,13 +21,17 @@ function App() {
         
         {/* Protected Routes */}
         <Route 
-          path="/candidate" 
+          path="/candidate/*" 
           element={
             <ProtectedRoute allowedRole="candidate">
               <CandidateDashboard />
             </ProtectedRoute>
           } 
-        />
+        >
+          <Route index element={<Navigate to="home" replace />} />
+          <Route path="home" element={<CandidateHome />} />
+          <Route path="applications" element={<CandidateApplications />} />
+        </Route>
         <Route 
           path="/employer" 
           element={
