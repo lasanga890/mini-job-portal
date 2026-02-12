@@ -1,55 +1,39 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../context/AuthContext';
-import { getEmployerApplications, updateApplicationStatus } from '../../../services/applicationService';
 import { getEmployerJobs } from '../../../services/jobService';
+import useEmployerApplications from '../../../hooks/useEmployerApplications';
 import Card from '../../../components/common/Card';
 import Button from '../../../components/common/Button';
 import Loading from '../../../components/common/Loading';
 
 const EmployerApplications = () => {
     const { user, loading: authLoading } = useAuth();
-    const [applications, setApplications] = useState([]);
     const [jobs, setJobs] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [updatingId, setUpdatingId] = useState(null);
+    const [jobsLoading, setJobsLoading] = useState(true);
     const [filter, setFilter] = useState('all');
     const [selectedJobId, setSelectedJobId] = useState(null);
+    const { applications, loading: appsLoading, updatingId, updateStatus } = useEmployerApplications(user?.uid);
 
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchJobs = async () => {
             try {
-                const [appsData, jobsData] = await Promise.all([
-                    getEmployerApplications(user.uid),
-                    getEmployerJobs(user.uid)
-                ]);
-                setApplications(appsData);
+                setJobsLoading(true);
+                const jobsData = await getEmployerJobs(user.uid);
                 setJobs(jobsData);
             } catch (error) {
-                console.error("Error fetching data:", error);
+                console.error("Error fetching jobs:", error);
             } finally {
-                setLoading(false);
+                setJobsLoading(false);
             }
         };
 
         if (!authLoading && user) {
-            fetchData();
+            fetchJobs();
         }
     }, [user, authLoading]);
 
-    const handleStatusUpdate = async (appId, newStatus) => {
-        setUpdatingId(appId);
-        try {
-            await updateApplicationStatus(appId, newStatus);
-            setApplications(prev => prev.map(app =>
-                app.id === appId ? { ...app, status: newStatus } : app
-            ));
-        } catch (error) {
-            console.error("Failed to update status:", error);
-        } finally {
-            setUpdatingId(null);
-        }
-    };
+
 
     const getStatusColor = (status) => {
         switch (status) {
@@ -60,7 +44,7 @@ const EmployerApplications = () => {
         }
     };
 
-    if (authLoading || loading) return <Loading />;
+    if (authLoading || appsLoading || jobsLoading) return <Loading />;
 
     // Initialize jobGroups with all jobs
     const jobGroups = {};
@@ -247,7 +231,7 @@ const EmployerApplications = () => {
 
                                             <div className="grid grid-cols-2 gap-3 mt-2">
                                                 <button
-                                                    onClick={() => handleStatusUpdate(app.id, 'shortlisted')}
+                                                    onClick={() => updateStatus(app.id, 'shortlisted')}
                                                     disabled={updatingId === app.id || app.status === 'shortlisted'}
                                                     className={`py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border-2 ${app.status === 'shortlisted'
                                                         ? 'bg-green-500 border-green-500 text-white shadow-lg shadow-green-500/20'
@@ -257,7 +241,7 @@ const EmployerApplications = () => {
                                                     {updatingId === app.id ? '...' : 'Shortlist'}
                                                 </button>
                                                 <button
-                                                    onClick={() => handleStatusUpdate(app.id, 'rejected')}
+                                                    onClick={() => updateStatus(app.id, 'rejected')}
                                                     disabled={updatingId === app.id || app.status === 'rejected'}
                                                     className={`py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border-2 ${app.status === 'rejected'
                                                         ? 'bg-red-500 border-red-500 text-white shadow-lg shadow-red-500/20'
