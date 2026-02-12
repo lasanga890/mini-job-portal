@@ -17,6 +17,7 @@ const EmployerHome = () => {
     totalApplications: 0,
     shortlisted: 0,
   });
+  const [recentJobs, setRecentJobs] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -37,6 +38,9 @@ const EmployerHome = () => {
           totalApplications: totalAppsCount,
           shortlisted: shortlistedCount,
         });
+
+        // Get latest 3 jobs
+        setRecentJobs(jobs.slice(0, 3));
       } catch (err) {
         console.error("Error fetching employer stats:", err);
       } finally {
@@ -85,22 +89,44 @@ const EmployerHome = () => {
           </Card>
         </div>
 
-        {/* Quick Actions */}
-        <div className="flex flex-wrap gap-4">
-          <Button variant="primary" onClick={() => navigate('/employer/post-job')}>
-            ➕ Post a New Job
-          </Button>
-          <Button variant="secondary" onClick={() => navigate('/employer/my-jobs')}>
-            📋 Manage My Jobs
-          </Button>
-        </div>
 
-        {/* Latest Activity Placeholder */}
+
+        {/* Latest Activity Section */}
         <div className="space-y-4">
-          <h2 className="text-2xl font-bold text-white">Recent Activity</h2>
-          <Card className="p-8 text-center bg-white/5 border-dashed">
-            <p className="text-text-dim italic">No recent activity to show yet. Start by posting a job!</p>
-          </Card>
+          <h2 className="text-2xl font-bold text-white">Recent Postings</h2>
+          {recentJobs.length === 0 ? (
+            <Card className="p-8 text-center bg-white/5 border-dashed">
+              <p className="text-text-dim italic">No recent activity to show yet. Start by posting a job!</p>
+            </Card>
+          ) : (
+            <div className="grid gap-4">
+              {recentJobs.map(job => (
+                <Card key={job.id} className="p-4 flex items-center justify-between hover:bg-white/5 transition-colors cursor-pointer border border-white/5" onClick={() => navigate(`/employer/my-jobs`)}>
+                  <div className="flex items-center gap-4">
+                    {/* <div className="size-10 rounded-full bg-accent-purple/10 flex items-center justify-center text-accent-purple font-bold">
+                      {job.title.charAt(0).toUpperCase()}
+                    </div> */}
+                    <div>
+                      <p className="text-white font-medium">{job.title}</p>
+                      <p className="text-xs text-text-dim">{job.location} • {job.type}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[10px] uppercase tracking-wider text-text-dim font-bold">Status</p>
+                    <p className={`text-xs font-bold uppercase ${job.status === 'active' ? 'text-green-400' : 'text-accent-purple'}`}>
+                      {job.status}
+                    </p>
+                  </div>
+                </Card>
+              ))}
+              <button
+                onClick={() => navigate('/employer/my-jobs')}
+                className="text-accent-purple hover:text-accent-purple/80 text-sm font-semibold transition-colors w-max"
+              >
+                View all postings →
+              </button>
+            </div>
+          )}
         </div>
 
       </div>

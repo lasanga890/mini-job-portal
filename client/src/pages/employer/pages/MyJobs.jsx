@@ -102,9 +102,9 @@ const MyJobs = () => {
             <h1 className="text-3xl font-bold text-white">My Job Postings</h1>
             <p className="text-text-dim mt-1">Manage and track your active job listings</p>
           </div>
-          <Button variant="primary" onClick={() => navigate('/employer/post-job')}>
+          {/* <Button variant="primary" onClick={() => navigate('/employer/post-job')}>
             Post New Job
-          </Button>
+          </Button> */}
         </div>
 
         {error && <p className="text-red-500">{error}</p>}
