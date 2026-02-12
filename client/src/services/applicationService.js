@@ -7,6 +7,8 @@ import {
   where,
   orderBy,
   addDoc,
+  updateDoc,
+  doc,
   serverTimestamp 
 } from "firebase/firestore";
 
@@ -19,7 +21,8 @@ export const getEmployerApplications = async (employerId) => {
   try {
     const q = query(
       collection(db, APPLICATIONS_COLLECTION), 
-      where("employerId", "==", employerId)
+      where("employerId", "==", employerId),
+      orderBy("createdAt", "desc")
     );
     const querySnapshot = await getDocs(q);
     return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -76,6 +79,19 @@ export const applyToJob = async (applicationData) => {
     return docRef.id;
   } catch (error) {
     console.error("Error applying to job:", error);
+    throw error;
+  }
+};
+/**
+ * Update application status (Pending, Shortlisted, Rejected)
+ */
+export const updateApplicationStatus = async (applicationId, status) => {
+  try {
+    const docRef = doc(db, APPLICATIONS_COLLECTION, applicationId);
+    await updateDoc(docRef, { status });
+    return true;
+  } catch (error) {
+    console.error("Error updating application status:", error);
     throw error;
   }
 };

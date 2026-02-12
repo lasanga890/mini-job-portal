@@ -23,7 +23,7 @@ const Navbar = () => {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      navigate('/login');
+      navigate('/');
     } catch (error) {
       console.error("Error logging out:", error);
     }
@@ -67,6 +67,7 @@ const Navbar = () => {
             <span onClick={() => navigate('/employer/home')} className={getLinkClass('/employer/home')}>Home</span>
             <span onClick={() => navigate('/employer/post-job')} className={getLinkClass('/employer/post-job')}>Post Job</span>
             <span onClick={() => navigate('/employer/my-jobs')} className={getLinkClass('/employer/my-jobs')}>My Jobs</span>
+            <span onClick={() => navigate('/employer/applications')} className={getLinkClass('/employer/applications')}>Applications</span>
           </>
         )}
 
@@ -140,6 +141,7 @@ const Navbar = () => {
             <span onClick={() => { navigate('/employer/home'); setIsMobileMenuOpen(false); }} className={`text-lg ${getLinkClass('/employer/home')}`}>Home</span>
             <span onClick={() => { navigate('/employer/post-job'); setIsMobileMenuOpen(false); }} className={`text-lg ${getLinkClass('/employer/post-job')}`}>Post Job</span>
             <span onClick={() => { navigate('/employer/my-jobs'); setIsMobileMenuOpen(false); }} className={`text-lg ${getLinkClass('/employer/my-jobs')}`}>My Jobs</span>
+            <span onClick={() => { navigate('/employer/applications'); setIsMobileMenuOpen(false); }} className={`text-lg ${getLinkClass('/employer/applications')}`}>Applications</span>
           </>
         )}
 

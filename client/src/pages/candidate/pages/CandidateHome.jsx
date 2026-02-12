@@ -98,12 +98,12 @@ function CandidateHome() {
           <Button variant="primary" onClick={() => navigate('/candidate/jobs')}>
             🔍 Browse Jobs
           </Button>
-          <Button variant="secondary" onClick={() => navigate('/candidate/profile')}>
+          {/* <Button variant="secondary" onClick={() => navigate('/candidate/profile')}>
             👤 Edit Profile
           </Button>
           <Button variant="secondary" onClick={() => navigate('/candidate/applications')}>
             📋 My Applications
-          </Button>
+          </Button> */}
         </div>
 
         {/* Recent Applications */}

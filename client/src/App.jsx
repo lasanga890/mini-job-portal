@@ -13,6 +13,7 @@ import EmployerHome from './pages/employer/pages/EmployerHome.jsx'
 import JobPost from './pages/employer/pages/JobPost.jsx'
 import MyJobs from './pages/employer/pages/MyJobs.jsx'
 import EmployerProfile from './pages/employer/pages/EmployerProfile.jsx'
+import EmployerApplications from './pages/employer/pages/EmployerApplications.jsx'
 import AdminDashboard from './pages/AdminDashboard.jsx'
 
 import ProtectedRoute from './routes/ProtectedRoute.jsx'
@@ -54,6 +55,7 @@ function App() {
           <Route path="edit-job/:jobId" element={<JobPost />} />
           <Route path="my-jobs" element={<MyJobs />} />
           <Route path="profile" element={<EmployerProfile />} />
+          <Route path="applications" element={<EmployerApplications />} />
         </Route>
         <Route
           path="/admin"
