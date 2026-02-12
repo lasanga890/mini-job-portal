@@ -6,6 +6,9 @@ import Card from '../../../components/common/Card';
 import Button from '../../../components/common/Button';
 import Loading from '../../../components/common/Loading';
 
+import { getEmployerJobs } from '../../../services/jobService';
+import { getEmployerApplications } from '../../../services/applicationService';
+
 const EmployerHome = () => {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
@@ -17,21 +20,37 @@ const EmployerHome = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        // Fetch jobs and applications in parallel
+        const [jobs, applications] = await Promise.all([
+          getEmployerJobs(user.uid),
+          getEmployerApplications(user.uid)
+        ]);
+
+        const activeJobsCount = jobs.filter(job => job.status === 'active').length;
+        const totalAppsCount = applications.length;
+        const shortlistedCount = applications.filter(app => app.status === 'shortlisted').length;
+
+        setStats({
+          activeJobs: activeJobsCount,
+          totalApplications: totalAppsCount,
+          shortlisted: shortlistedCount,
+        });
+      } catch (err) {
+        console.error("Error fetching employer stats:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     if (authLoading) return;
     if (!user) {
       navigate('/login');
       return;
     }
-    
-    // Mocking stats for now
-    setTimeout(() => {
-      setStats({
-        activeJobs: 5,
-        totalApplications: 24,
-        shortlisted: 8,
-      });
-      setLoading(false);
-    }, 1000);
+
+    fetchStats();
   }, [user, authLoading, navigate]);
 
   if (authLoading || loading) {
@@ -41,7 +60,7 @@ const EmployerHome = () => {
   return (
     <div className="min-h-screen bg-primary-bg pt-24 px-4 sm:px-6 lg:px-8 font-sans text-text-main pb-12">
       <div className="max-w-7xl mx-auto space-y-8">
-        
+
         {/* Header */}
         <div>
           <h1 className="text-3xl sm:text-4xl font-bold bg-clip-text text-transparent bg-linear-to-r from-white to-text-dim mb-2">

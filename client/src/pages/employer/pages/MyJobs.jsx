@@ -19,6 +19,7 @@ const MyJobs = () => {
   // Modal states
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedJob, setSelectedJob] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -42,6 +43,11 @@ const MyJobs = () => {
     }
     fetchJobs();
   }, [user, authLoading, navigate]);
+
+  const handleViewClick = (job) => {
+    setSelectedJob(job);
+    setIsViewModalOpen(true);
+  };
 
   const handleDeleteClick = (job) => {
     setSelectedJob(job);
@@ -90,7 +96,7 @@ const MyJobs = () => {
   return (
     <div className="min-h-screen bg-primary-bg pt-24 px-4 sm:px-6 lg:px-8 font-sans text-text-main pb-12">
       <div className="max-w-5xl mx-auto space-y-8">
-        
+
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold text-white">My Job Postings</h1>
@@ -120,9 +126,6 @@ const MyJobs = () => {
                     <h3 className="text-xl font-bold text-white group-hover:text-accent-purple transition-colors">
                       {job.title}
                     </h3>
-                    {/* <p className="text-sm text-text-dim  bg-white/5 p-3 rounded-lg border border-white/5">
-                        {job.description}
-                    </p> */}
                     <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm text-text-dim/80">
                       <span className="flex items-center gap-1.5">
                         <svg className="w-4 h-4 text-accent-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
@@ -144,21 +147,32 @@ const MyJobs = () => {
                       </span>
                     </div>
                   </div>
-                  
-                  <div className="flex flex-row md:flex-col items-center gap-2">
-                    <Button 
-                        variant="secondary" 
-                        size="sm"
-                        className="w-full md:w-24"
-                        onClick={() => handleEditClick(job)}
+
+                  <div className="flex flex-row items-center gap-2">
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      // Removed w-full, kept w-24 for consistent sizing
+                      className="w-24 bg-accent-purple/10 text-accent-purple hover:bg-accent-purple hover:text-white border border-accent-purple/20"
+                      onClick={() => handleViewClick(job)}
+                    >
+                      View
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      // Removed w-full, kept w-24
+                      className="w-24"
+                      onClick={() => handleEditClick(job)}
                     >
                       Edit
                     </Button>
-                    <Button 
-                        variant="outline" 
-                        size="sm"
-                        className="w-full md:w-24 border-red-500/30 text-red-500 hover:bg-red-500/10 hover:border-red-500 transition-all font-medium"
-                        onClick={() => handleDeleteClick(job)}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      // Removed w-full, kept w-24
+                      className="w-24 border-red-500/30 text-red-500 hover:bg-red-500/10 hover:border-red-500 transition-all font-medium"
+                      onClick={() => handleDeleteClick(job)}
                     >
                       Delete
                     </Button>
@@ -169,15 +183,57 @@ const MyJobs = () => {
           </div>
         )}
 
+        {/* View Modal */}
+        <Modal
+          isOpen={isViewModalOpen}
+          onClose={() => { setIsViewModalOpen(false); setSelectedJob(null); }}
+          title="Job Details"
+        >
+          {selectedJob && (
+            <div className="space-y-6">
+              <div className="pb-6 border-b border-white/5">
+                <h2 className="text-2xl font-bold text-white mb-4">{selectedJob.title}</h2>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-white/5 p-3 rounded-xl border border-white/5">
+                    <p className="text-xs text-text-dim uppercase tracking-wider mb-1 font-semibold">Location</p>
+                    <p className="text-white flex items-center gap-2">📍 {selectedJob.location}</p>
+                  </div>
+                  <div className="bg-white/5 p-3 rounded-xl border border-white/5">
+                    <p className="text-xs text-text-dim uppercase tracking-wider mb-1 font-semibold">Job Type</p>
+                    <p className="text-white flex items-center gap-2">💼 {selectedJob.type}</p>
+                  </div>
+                  <div className="bg-white/5 p-3 rounded-xl border border-white/5">
+                    <p className="text-xs text-text-dim uppercase tracking-wider mb-1 font-semibold">Salary</p>
+                    <p className="text-white flex items-center gap-2">💰 {selectedJob.salary || 'Not specified'}</p>
+                  </div>
+                  <div className="bg-white/5 p-3 rounded-xl border border-white/5">
+                    <p className="text-xs text-text-dim uppercase tracking-wider mb-1 font-semibold">Posted On</p>
+                    <p className="text-white flex items-center gap-2">📅 {selectedJob.createdAt?.toDate().toLocaleDateString()}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <h3 className="text-lg font-bold text-white">Job Description</h3>
+                <div className="bg-white/5 p-6 rounded-2xl border border-white/5">
+                  <p className="text-text-dim whitespace-pre-wrap leading-relaxed">
+                    {selectedJob.description}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+        </Modal>
+
         {/* Edit Modal */}
         <Modal
           isOpen={isEditModalOpen}
           onClose={() => { setIsEditModalOpen(false); setSelectedJob(null); }}
           title="Edit Job Posting"
         >
-          <JobForm 
+          <JobForm
             key={selectedJob?.id}
-            initialData={selectedJob} 
+            initialData={selectedJob}
             onSubmit={handleUpdateJob}
             onCancel={() => { setIsEditModalOpen(false); setSelectedJob(null); }}
             isSaving={isSaving}
@@ -191,14 +247,14 @@ const MyJobs = () => {
           title="Delete Job Posting"
           footer={
             <>
-              <Button 
-                variant="secondary" 
+              <Button
+                variant="secondary"
                 onClick={() => { setIsDeleteModalOpen(false); setSelectedJob(null); }}
               >
                 Cancel
               </Button>
-              <Button 
-                variant="primary" 
+              <Button
+                variant="primary"
                 className="bg-red-500 shadow-red-500/30 hover:bg-red-600 border-none"
                 onClick={confirmDelete}
                 loading={isSaving}
@@ -217,7 +273,7 @@ const MyJobs = () => {
             <div className="text-center">
               <p className="text-white text-lg font-semibold">Are you sure?</p>
               <p className="text-text-dim mt-1">
-                You are about to delete <span className="text-white font-medium">"{selectedJob?.title}"</span>. 
+                You are about to delete <span className="text-white font-medium">"{selectedJob?.title}"</span>.
                 This action cannot be undone.
               </p>
             </div>
