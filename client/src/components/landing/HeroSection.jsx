@@ -34,7 +34,7 @@ const HeroSection = ({ onFilter, jobTypes, locations }) => {
               Build Your Future
             </span>
           </h1>
-          
+
           <p className="mt-4 max-w-2xl mx-auto text-xl text-text-dim mb-12 animate-slide-up" style={{ animationDelay: '0.1s' }}>
             Connect with top employers and discover opportunities that match your skills and aspirations.
           </p>
@@ -64,9 +64,9 @@ const HeroSection = ({ onFilter, jobTypes, locations }) => {
                 onChange={(e) => setSelectedLocation(e.target.value)}
                 className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-accent-purple focus:bg-white/10 transition-all appearance-none cursor-pointer"
               >
-                <option value="">All Locations</option>
+                <option value="" className="text-black">All Locations</option>
                 {locations.map(location => (
-                  <option key={location} value={location}>
+                  <option key={location} value={location} className="text-black">
                     {location}
                   </option>
                 ))}
@@ -81,9 +81,9 @@ const HeroSection = ({ onFilter, jobTypes, locations }) => {
                 onChange={(e) => setSelectedType(e.target.value)}
                 className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-accent-purple focus:bg-white/10 transition-all appearance-none cursor-pointer"
               >
-                <option value="">All Types</option>
+                <option value="" className="text-black">All Types</option>
                 {jobTypes.map(type => (
-                  <option key={type} value={type}>
+                  <option key={type} value={type} className="text-black">
                     {type}
                   </option>
                 ))}
