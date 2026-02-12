@@ -98,3 +98,20 @@ export const deleteJob = async (jobId) => {
     throw error;
   }
 };
+/**
+ * Get all active jobs (for candidates)
+ */
+export const getAllJobs = async () => {
+  try {
+    const q = query(
+      collection(db, JOBS_COLLECTION), 
+      where("status", "==", "active"),
+      orderBy("createdAt", "desc")
+    );
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  } catch (error) {
+    console.error("Error fetching all jobs:", error);
+    throw error;
+  }
+};

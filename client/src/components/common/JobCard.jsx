@@ -4,16 +4,25 @@ import Card from './Card';
 import Button from './Button';
 
 const JobCard = ({ job }) => {
+  const formatDate = (timestamp) => {
+    if (!timestamp) return 'Just now';
+    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+    const diff = Math.floor((new Date() - date) / (1000 * 60 * 60 * 24));
+    if (diff === 0) return 'Today';
+    if (diff === 1) return 'Yesterday';
+    return `${diff} days ago`;
+  };
+
   return (
-    <Card className="p-6 hover:border-accent-purple/50 transition-all duration-300 group relative overflow-hidden">
+    <Card className="p-6 hover:border-accent-purple/50 transition-all duration-300 group relative overflow-hidden flex flex-col h-full">
       <div className="flex justify-between items-start mb-4">
         <div>
-          <h3 className="text-xl font-bold text-text-main group-hover:text-accent-purple transition-colors">
+          <h3 className="text-xl font-bold text-text-main group-hover:text-accent-purple transition-colors line-clamp-1">
             {job.title}
           </h3>
-          <p className="text-text-dim mt-1">{job.company}</p>
+          <p className="text-text-dim mt-1 font-medium">{job.employerName || 'Unknown Company'}</p>
         </div>
-        <span className="px-3 py-1 rounded-full text-xs font-medium bg-white/5 text-text-dim border border-white/10">
+        <span className="px-3 py-1 rounded-full text-xs font-bold bg-accent-purple/10 text-accent-purple border border-accent-purple/20">
           {job.type}
         </span>
       </div>
@@ -22,14 +31,16 @@ const JobCard = ({ job }) => {
         <span className="flex items-center gap-1">
           📍 {job.location}
         </span>
-        <span className="flex items-center gap-1">
-          💰 {job.salary}
-        </span>
+        {job.salary && (
+          <span className="flex items-center gap-1">
+            💰 {job.salary}
+          </span>
+        )}
       </div>
 
       <div className="flex justify-between items-center mt-auto">
-        <span className="text-xs text-text-dim">Posted {job.posted}</span>
-        <Button variant="outline" size="sm" className="group-hover:bg-accent-purple group-hover:text-white">
+        <span className="text-xs text-text-dim">Posted {formatDate(job.createdAt)}</span>
+        <Button variant="outline" size="sm" className="group-hover:bg-accent-purple group-hover:text-white font-bold transition-all">
           Apply Now
         </Button>
       </div>
