@@ -11,6 +11,7 @@ import EmployerDashboard from './pages/employer/EmployerDashboard.jsx'
 import EmployerHome from './pages/employer/pages/EmployerHome.jsx'
 import JobPost from './pages/employer/pages/JobPost.jsx'
 import MyJobs from './pages/employer/pages/MyJobs.jsx'
+import EmployerProfile from './pages/employer/pages/EmployerProfile.jsx'
 import AdminDashboard from './pages/AdminDashboard.jsx'
 
 import ProtectedRoute from './routes/ProtectedRoute.jsx'
@@ -22,43 +23,43 @@ function App() {
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        
+
         {/* Protected Routes */}
-        <Route 
-          path="/candidate/*" 
+        <Route
+          path="/candidate/*"
           element={
             <ProtectedRoute allowedRole="candidate">
               <CandidateDashboard />
             </ProtectedRoute>
-          } 
+          }
         >
           <Route index element={<Navigate to="home" replace />} />
           <Route path="home" element={<CandidateHome />} />
           <Route path="applications" element={<CandidateApplications />} />
           <Route path="profile" element={<CandidateProfile />} />
         </Route>
-        <Route 
-          path="/employer/*" 
+        <Route
+          path="/employer/*"
           element={
             <ProtectedRoute allowedRole="employer">
               <EmployerDashboard />
             </ProtectedRoute>
-          } 
+          }
         >
           <Route index element={<Navigate to="home" replace />} />
           <Route path="home" element={<EmployerHome />} />
           <Route path="post-job" element={<JobPost />} />
           <Route path="edit-job/:jobId" element={<JobPost />} />
           <Route path="my-jobs" element={<MyJobs />} />
-          <Route path="profile" element={<div>Employer Profile Page (Coming Soon)</div>} />
+          <Route path="profile" element={<EmployerProfile />} />
         </Route>
-        <Route 
-          path="/admin" 
+        <Route
+          path="/admin"
           element={
             <ProtectedRoute allowedRole="admin">
               <AdminDashboard />
             </ProtectedRoute>
-          } 
+          }
         />
       </Routes>
     </BrowserRouter>

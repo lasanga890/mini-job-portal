@@ -41,8 +41,8 @@ const Navbar = () => {
           <span onClick={() => navigate('/login')} className="text-text-dim hover:text-white transition-colors font-medium cursor-pointer">
             Sign In
           </span>
-          <Button 
-            variant="primary" 
+          <Button
+            variant="primary"
             size="sm"
             onClick={() => navigate('/register')}
           >
@@ -61,7 +61,7 @@ const Navbar = () => {
             <span onClick={() => navigate('/candidate/applications')} className={getLinkClass('/candidate/applications')}>My Applications</span>
           </>
         )}
-        
+
         {role === 'employer' && (
           <>
             <span onClick={() => navigate('/employer/home')} className={getLinkClass('/employer/home')}>Home</span>
@@ -75,8 +75,8 @@ const Navbar = () => {
         )}
 
         <div className="h-6 w-px bg-white/10 mx-2"></div>
-         
-        
+
+
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity" onClick={() => navigate(`/${role}/profile`)}>
             <div className="w-8 h-8 rounded-full bg-accent-purple flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-accent-purple/20">
@@ -86,8 +86,8 @@ const Navbar = () => {
               {user.name || user.email}
             </span>
           </div>
-          <Button 
-            variant="secondary" 
+          <Button
+            variant="secondary"
             size="sm"
             onClick={handleLogout}
           >
@@ -102,17 +102,17 @@ const Navbar = () => {
     if (!user) {
       return (
         <>
-          <span 
+          <span
             onClick={() => {
               navigate('/login');
               setIsMobileMenuOpen(false);
-            }} 
+            }}
             className="text-text-dim hover:text-white transition-colors font-medium text-lg cursor-pointer"
           >
             Sign In
           </span>
-          <Button 
-            variant="primary" 
+          <Button
+            variant="primary"
             size="md"
             className="w-full max-w-xs"
             onClick={() => {
@@ -137,16 +137,16 @@ const Navbar = () => {
 
         {role === 'employer' && (
           <>
-             <span onClick={() => { navigate('/employer/home'); setIsMobileMenuOpen(false); }} className={`text-lg ${getLinkClass('/employer/home')}`}>Home</span>
-             <span onClick={() => { navigate('/employer/post-job'); setIsMobileMenuOpen(false); }} className={`text-lg ${getLinkClass('/employer/post-job')}`}>Post Job</span>
-             <span onClick={() => { navigate('/employer/my-jobs'); setIsMobileMenuOpen(false); }} className={`text-lg ${getLinkClass('/employer/my-jobs')}`}>My Jobs</span>
+            <span onClick={() => { navigate('/employer/home'); setIsMobileMenuOpen(false); }} className={`text-lg ${getLinkClass('/employer/home')}`}>Home</span>
+            <span onClick={() => { navigate('/employer/post-job'); setIsMobileMenuOpen(false); }} className={`text-lg ${getLinkClass('/employer/post-job')}`}>Post Job</span>
+            <span onClick={() => { navigate('/employer/my-jobs'); setIsMobileMenuOpen(false); }} className={`text-lg ${getLinkClass('/employer/my-jobs')}`}>My Jobs</span>
           </>
         )}
 
         {role === 'admin' && (
           <span onClick={() => { navigate('/admin'); setIsMobileMenuOpen(false); }} className={`text-lg ${getLinkClass('/admin')}`}>Dashboard</span>
         )}
-        
+
         <div className="w-full h-px bg-white/10 my-2"></div>
 
         <div className="flex flex-col items-center gap-2 mb-2 cursor-pointer" onClick={() => { navigate(`/${role}/profile`); setIsMobileMenuOpen(false); }}>
@@ -156,8 +156,8 @@ const Navbar = () => {
           <span className="text-sm text-text-dim">{user.name || user.email}</span>
         </div>
 
-        <Button 
-          variant="secondary" 
+        <Button
+          variant="secondary"
           size="md"
           className="w-full max-w-xs"
           onClick={() => {
@@ -172,18 +172,17 @@ const Navbar = () => {
   };
 
   return (
-    <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-      scrolled ? 'bg-primary-bg/80 backdrop-blur-md border-b border-white/5 py-4' : 'bg-transparent py-6'
-    }`}>
+    <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-primary-bg/80 backdrop-blur-md border-b border-white/5 py-4' : 'bg-transparent py-6'
+      }`}>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
         <span onClick={() => navigate('/')} className="text-2xl font-bold bg-clip-text text-transparent bg-linear-to-r from-white to-text-dim hover:opacity-80 transition-opacity cursor-pointer">
           JobPortal
         </span>
-        
+
         {renderNavLinks()}
 
         {/* Mobile Menu Button */}
-        <button 
+        <button
           className="md:hidden text-text-dim hover:text-white transition-colors focus:outline-none"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
