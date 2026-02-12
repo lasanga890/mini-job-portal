@@ -160,7 +160,6 @@ const Navbar = () => {
           {/* 1. Added 'group' class to parent */}
           <div
             className="group flex items-center gap-2 cursor-pointer transition-all"
-            onClick={() => navigate(`/${role}/profile`)}
           >
             <div className="w-8 h-8 rounded-full bg-accent-purple flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-accent-purple/20">
               {user.name?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase()}
