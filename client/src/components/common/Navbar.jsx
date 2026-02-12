@@ -22,8 +22,11 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
-      await signOut(auth);
+      // 1. Navigate to Landing page immediately
       navigate('/');
+
+      // 2. Then sign out
+      await signOut(auth);
     } catch (error) {
       console.error("Error logging out:", error);
     }
@@ -57,14 +60,14 @@ const Navbar = () => {
       <div className="hidden md:flex items-center gap-6">
         {role === 'candidate' && (
           <>
-            <span onClick={() => navigate('/candidate/home')} className={getLinkClass('/candidate/home')}>Home</span>
+            <span onClick={() => navigate('/candidate/dashboard')} className={getLinkClass('/candidate/dashboard')}>Dashboard</span>
             <span onClick={() => navigate('/candidate/applications')} className={getLinkClass('/candidate/applications')}>My Applications</span>
           </>
         )}
 
         {role === 'employer' && (
           <>
-            <span onClick={() => navigate('/employer/home')} className={getLinkClass('/employer/home')}>Home</span>
+            <span onClick={() => navigate('/employer/dashboard')} className={getLinkClass('/employer/dashboard')}>Dashboard</span>
             <span onClick={() => navigate('/employer/post-job')} className={getLinkClass('/employer/post-job')}>Post Job</span>
             <span onClick={() => navigate('/employer/my-jobs')} className={getLinkClass('/employer/my-jobs')}>My Jobs</span>
             <span onClick={() => navigate('/employer/applications')} className={getLinkClass('/employer/applications')}>Applications</span>
@@ -131,14 +134,14 @@ const Navbar = () => {
       <>
         {role === 'candidate' && (
           <>
-            <span onClick={() => { navigate('/candidate/home'); setIsMobileMenuOpen(false); }} className={`text-lg ${getLinkClass('/candidate/home')}`}>Home</span>
+            <span onClick={() => { navigate('/candidate/dashboard'); setIsMobileMenuOpen(false); }} className={`text-lg ${getLinkClass('/candidate/dashboard')}`}>Dashboard</span>
             <span onClick={() => { navigate('/candidate/applications'); setIsMobileMenuOpen(false); }} className={`text-lg ${getLinkClass('/candidate/applications')}`}>My Applications</span>
           </>
         )}
 
         {role === 'employer' && (
           <>
-            <span onClick={() => { navigate('/employer/home'); setIsMobileMenuOpen(false); }} className={`text-lg ${getLinkClass('/employer/home')}`}>Home</span>
+            <span onClick={() => { navigate('/employer/dashboard'); setIsMobileMenuOpen(false); }} className={`text-lg ${getLinkClass('/employer/dashboard')}`}>Dashboard</span>
             <span onClick={() => { navigate('/employer/post-job'); setIsMobileMenuOpen(false); }} className={`text-lg ${getLinkClass('/employer/post-job')}`}>Post Job</span>
             <span onClick={() => { navigate('/employer/my-jobs'); setIsMobileMenuOpen(false); }} className={`text-lg ${getLinkClass('/employer/my-jobs')}`}>My Jobs</span>
             <span onClick={() => { navigate('/employer/applications'); setIsMobileMenuOpen(false); }} className={`text-lg ${getLinkClass('/employer/applications')}`}>Applications</span>

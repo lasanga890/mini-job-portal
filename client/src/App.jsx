@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Landing from './pages/Landing.jsx'
 import Login from './pages/Login.jsx'
 import Register from './pages/Register.jsx'
+import PublicJobDetails from './pages/PublicJobDetails.jsx'
 import CandidateDashboard from './pages/candidate/CandidateDashboard.jsx'
 import CandidateHome from './pages/candidate/pages/CandidateHome.jsx'
 import CandidateApplications from './pages/candidate/pages/CandidateApplications.jsx'
@@ -26,6 +27,7 @@ function App() {
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/job/:jobId" element={<PublicJobDetails />} />
 
         {/* Protected Routes */}
         <Route
@@ -36,8 +38,8 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route index element={<Navigate to="home" replace />} />
-          <Route path="home" element={<CandidateHome />} />
+          <Route index element={<Navigate to="dashboard" replace />} />
+          <Route path="dashboard" element={<CandidateHome />} />
           <Route path="applications" element={<CandidateApplications />} />
           <Route path="profile" element={<CandidateProfile />} />
           <Route path="job/:jobId" element={<JobDetails />} />
@@ -50,8 +52,8 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route index element={<Navigate to="home" replace />} />
-          <Route path="home" element={<EmployerHome />} />
+          <Route index element={<Navigate to="dashboard" replace />} />
+          <Route path="dashboard" element={<EmployerHome />} />
           <Route path="post-job" element={<JobPost />} />
           <Route path="edit-job/:jobId" element={<JobPost />} />
           <Route path="my-jobs" element={<MyJobs />} />
