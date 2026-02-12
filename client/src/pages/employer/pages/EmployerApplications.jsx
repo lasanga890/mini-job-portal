@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../context/AuthContext';
 import { getEmployerApplications, updateApplicationStatus } from '../../../services/applicationService';
+import { getEmployerJobs } from '../../../services/jobService';
 import Card from '../../../components/common/Card';
 import Button from '../../../components/common/Button';
 import Loading from '../../../components/common/Loading';
@@ -9,24 +10,30 @@ import Loading from '../../../components/common/Loading';
 const EmployerApplications = () => {
     const { user, loading: authLoading } = useAuth();
     const [applications, setApplications] = useState([]);
+    const [jobs, setJobs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [updatingId, setUpdatingId] = useState(null);
     const [filter, setFilter] = useState('all');
+    const [selectedJobId, setSelectedJobId] = useState(null);
 
     useEffect(() => {
-        const fetchApplications = async () => {
+        const fetchData = async () => {
             try {
-                const data = await getEmployerApplications(user.uid);
-                setApplications(data);
+                const [appsData, jobsData] = await Promise.all([
+                    getEmployerApplications(user.uid),
+                    getEmployerJobs(user.uid)
+                ]);
+                setApplications(appsData);
+                setJobs(jobsData);
             } catch (error) {
-                console.error("Error fetching applications:", error);
+                console.error("Error fetching data:", error);
             } finally {
                 setLoading(false);
             }
         };
 
         if (!authLoading && user) {
-            fetchApplications();
+            fetchData();
         }
     }, [user, authLoading]);
 
@@ -55,116 +62,216 @@ const EmployerApplications = () => {
 
     if (authLoading || loading) return <Loading />;
 
+    // Initialize jobGroups with all jobs
+    const jobGroups = {};
+    jobs.forEach(job => {
+        jobGroups[job.id] = { title: job.title, apps: [] };
+    });
+
+    // Populate jobGroups with applications
+    applications.forEach(app => {
+        const jobId = app.jobId;
+        if (jobGroups[jobId]) {
+            jobGroups[jobId].apps.push(app);
+        } else {
+            // Handle applications for jobs that might not be in the employer's current jobs list 
+            // (though this shouldn't happen based on user.uid fetch)
+            if (!jobGroups[jobId || 'general']) {
+                jobGroups[jobId || 'general'] = { title: app.jobTitle || 'General Application', apps: [] };
+            }
+            jobGroups[jobId || 'general'].apps.push(app);
+        }
+    });
+
     const filteredApps = filter === 'all'
-        ? applications
-        : applications.filter(app => app.status === filter);
+        ? (selectedJobId ? jobGroups[selectedJobId]?.apps || [] : applications)
+        : (selectedJobId
+            ? (jobGroups[selectedJobId]?.apps || []).filter(app => app.status === filter)
+            : applications.filter(app => app.status === filter));
 
     return (
         <div className="min-h-screen bg-primary-bg pt-24 px-4 sm:px-6 lg:px-8 font-sans text-text-main pb-12">
             <div className="max-w-7xl mx-auto space-y-8">
 
-                {/* Header */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div>
-                        <h1 className="text-3xl sm:text-4xl font-bold bg-clip-text text-transparent bg-linear-to-r from-white to-text-dim mb-2">
-                            Job Applications
-                        </h1>
-                        <p className="text-text-dim text-lg">Manage all incoming applications for your postings</p>
+                {/* Header Section */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <div className="flex-1">
+                        <div className="flex items-center gap-4 mb-3">
+                            {selectedJobId && (
+                                <button
+                                    onClick={() => { setSelectedJobId(null); setFilter('all'); }}
+                                    className="p-2.5 bg-white/5 hover:bg-white/10 rounded-xl text-accent-purple transition-all group border border-white/5 hover:border-white/10"
+                                >
+                                    <svg className="w-5 h-5 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+                                    </svg>
+                                </button>
+                            )}
+                            <h1 className="text-3xl sm:text-4xl font-bold bg-clip-text text-transparent bg-linear-to-r from-white to-text-dim capitalize">
+                                {selectedJobId ? jobGroups[selectedJobId]?.title : 'Job Applications'}
+                            </h1>
+                        </div>
+                        <p className="text-text-dim text-lg">
+                            {selectedJobId
+                                ? `Viewing detailed applicant list for this role`
+                                : 'Select a job to manage incoming candidate applications'}
+                        </p>
                     </div>
 
-                    <div className="flex gap-2 flex-wrap">
-                        {['all', 'pending', 'shortlisted', 'rejected'].map(s => (
-                            <button
-                                key={s}
-                                onClick={() => setFilter(s)}
-                                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border uppercase tracking-wider ${filter === s
-                                        ? 'bg-accent-purple text-white border-accent-purple'
-                                        : 'bg-white/5 text-text-dim border-white/10 hover:bg-white/10'
-                                    }`}
-                            >
-                                {s} ({s === 'all' ? applications.length : applications.filter(a => a.status === s).length})
-                            </button>
-                        ))}
-                    </div>
+                    {selectedJobId && (
+                        <div className="flex gap-2 flex-wrap bg-white/5 p-1.5 rounded-2xl border border-white/5">
+                            {['all', 'pending', 'shortlisted', 'rejected'].map(s => (
+                                <button
+                                    key={s}
+                                    onClick={() => setFilter(s)}
+                                    className={`px-5 py-2 rounded-xl text-xs font-bold transition-all uppercase tracking-wider ${filter === s
+                                        ? 'bg-accent-purple text-white shadow-lg shadow-accent-purple/20'
+                                        : 'text-text-dim hover:text-white hover:bg-white/5'
+                                        }`}
+                                >
+                                    {s} <span className="ml-1 opacity-60">({s === 'all' ? jobGroups[selectedJobId].apps.length : jobGroups[selectedJobId].apps.filter(a => a.status === s).length})</span>
+                                </button>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
-                {filteredApps.length === 0 ? (
-                    <div className="text-center py-20 bg-card-bg/50 rounded-2xl border border-white/5">
-                        <h3 className="text-xl font-medium text-white mb-2">No applications found</h3>
-                        <p className="text-text-dim">When candidates apply to your jobs, they will appear here.</p>
+                {jobs.length === 0 ? (
+                    <div className="text-center py-20 bg-card-bg/50 rounded-3xl border border-white/5 backdrop-blur-sm">
+                        <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl">�</div>
+                        <h3 className="text-2xl font-bold text-white mb-2">No jobs posted yet</h3>
+                        <p className="text-text-dim max-w-md mx-auto">Once you post a job, it will appear here for you to manage incoming applications.</p>
+                        <Button
+                            variant="primary"
+                            className="mt-6"
+                            onClick={() => window.location.href = '/employer/post-job'}
+                        >
+                            Post Your First Job
+                        </Button>
                     </div>
-                ) : (
-                    <div className="grid gap-6">
-                        {filteredApps.map(app => (
-                            <Card key={app.id} className="p-6 border border-white/5 hover:border-white/10 transition-all">
-                                <div className="flex flex-col lg:flex-row gap-6">
-                                    {/* Candidate Info */}
-                                    <div className="flex-1 space-y-4">
-                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                                            <div>
-                                                <h3 className="text-xl font-bold text-white mb-1">{app.candidateName}</h3>
-                                                <p className="text-accent-purple font-medium text-sm flex items-center gap-2">
-                                                    🎯 {app.jobTitle}
-                                                </p>
-                                            </div>
-                                            <span className={`px-3 py-1 rounded-full text-[10px] font-bold border uppercase self-start ${getStatusColor(app.status)}`}>
-                                                {app.status}
-                                            </span>
-                                        </div>
+                ) : !selectedJobId ? (
+                    /* Dashboard View: Job Summaries */
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-700">
+                        {Object.entries(jobGroups).map(([jobId, { title, apps }]) => (
+                            <Card key={jobId} className="p-7 border border-white/5 hover:border-accent-purple/30 transition-all group relative overflow-hidden flex flex-col bg-card-bg/40 backdrop-blur-md">
+                                <div className="absolute -top-6 -right-6 w-24 h-24 bg-accent-purple/10 blur-3xl rounded-full group-hover:bg-accent-purple/20 transition-all duration-500" />
 
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-text-dim">
-                                            <div className="flex items-center gap-2">
-                                                <span>📧</span> {app.candidateEmail}
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <span>📅</span> Applied {app.createdAt?.toDate ? app.createdAt.toDate().toLocaleDateString() : 'Recently'}
-                                            </div>
-                                        </div>
+                                <h3 className="text-xl font-bold text-white mb-6 pr-4 line-clamp-2 min-h-[3.5rem] group-hover:text-accent-purple transition-colors">{title}</h3>
 
-                                        {app.message && (
-                                            <div className="bg-white/5 rounded-xl p-4 border border-white/5">
-                                                <p className="text-xs text-text-dim uppercase font-bold tracking-widest mb-2">Message</p>
-                                                <p className="text-sm text-text-main italic leading-relaxed">"{app.message}"</p>
-                                            </div>
-                                        )}
+                                <div className="space-y-4 mb-8 flex-1">
+                                    <div className="flex justify-between items-center bg-white/5 p-4 rounded-2xl border border-white/5">
+                                        <span className="text-text-dim text-sm font-bold uppercase tracking-widest">Total Candidates</span>
+                                        <span className="text-3xl font-black text-white">{apps.length}</span>
                                     </div>
 
-                                    {/* Actions */}
-                                    <div className="lg:w-64 flex flex-col gap-3 justify-center border-t lg:border-t-0 lg:border-l border-white/5 pt-6 lg:pt-0 lg:pl-6">
-                                        <Button
-                                            variant="secondary"
-                                            className="w-full text-xs font-bold"
-                                            onClick={() => window.open(app.cvUrl, '_blank')}
-                                        >
-                                            📄 View Resume
-                                        </Button>
-
-                                        <div className="grid grid-cols-2 gap-2 mt-2">
-                                            <Button
-                                                variant="primary"
-                                                size="sm"
-                                                className={`bg-green-500/10 text-green-500 border-green-500/20 hover:bg-green-500 hover:text-white transition-all text-[10px] font-bold uppercase ${app.status === 'shortlisted' ? 'ring-2 ring-green-500' : ''}`}
-                                                onClick={() => handleStatusUpdate(app.id, 'shortlisted')}
-                                                loading={updatingId === app.id}
-                                                disabled={app.status === 'shortlisted'}
-                                            >
-                                                Shortlist
-                                            </Button>
-                                            <Button
-                                                variant="primary"
-                                                size="sm"
-                                                className={`bg-red-500/10 text-red-500 border-red-500/20 hover:bg-red-500 hover:text-white transition-all text-[10px] font-bold uppercase ${app.status === 'rejected' ? 'ring-2 ring-red-500' : ''}`}
-                                                onClick={() => handleStatusUpdate(app.id, 'rejected')}
-                                                loading={updatingId === app.id}
-                                                disabled={app.status === 'rejected'}
-                                            >
-                                                Reject
-                                            </Button>
+                                    <div className="grid grid-cols-3 gap-3">
+                                        <div className="bg-white/5 border border-white/5 rounded-2xl p-3 text-center hover:bg-yellow-400/5 hover:border-yellow-400/20 transition-colors">
+                                            <p className="text-xl font-black text-yellow-400">{apps.filter(a => a.status === 'pending').length}</p>
+                                            <p className="text-[10px] text-text-dim font-black uppercase tracking-widest">New</p>
+                                        </div>
+                                        <div className="bg-white/5 border border-white/5 rounded-2xl p-3 text-center hover:bg-green-400/5 hover:border-green-400/20 transition-colors">
+                                            <p className="text-xl font-black text-green-400">{apps.filter(a => a.status === 'shortlisted').length}</p>
+                                            <p className="text-[10px] text-text-dim font-black uppercase tracking-widest">Short</p>
+                                        </div>
+                                        <div className="bg-white/5 border border-white/5 rounded-2xl p-3 text-center hover:bg-red-400/5 hover:border-red-400/20 transition-colors">
+                                            <p className="text-xl font-black text-red-400">{apps.filter(a => a.status === 'rejected').length}</p>
+                                            <p className="text-[10px] text-text-dim font-black uppercase tracking-widest">Rej</p>
                                         </div>
                                     </div>
                                 </div>
+
+                                <Button
+                                    variant="primary"
+                                    className="w-full font-bold shadow-xl shadow-accent-purple/5 group-hover:shadow-accent-purple/20 transition-all py-4 rounded-xl"
+                                    onClick={() => setSelectedJobId(jobId)}
+                                >
+                                    <span className="flex items-center justify-center gap-2">
+                                        Review Applicants
+                                        <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" /></svg>
+                                    </span>
+                                </Button>
                             </Card>
                         ))}
+                    </div>
+                ) : (
+                    /* Detailed View: Candidate List */
+                    <div className="space-y-6 animate-in slide-in-from-bottom-6 fade-in duration-700">
+                        {filteredApps.length === 0 ? (
+                            <div className="text-center py-20 bg-white/2 rounded-3xl border border-dashed border-white/10">
+                                <p className="text-text-dim text-lg italic">No {filter !== 'all' ? filter : ''} applications found for this role.</p>
+                                <Button variant="secondary" className="mt-4" onClick={() => setFilter('all')}>View All Applications</Button>
+                            </div>
+                        ) : (
+                            filteredApps.map(app => (
+                                <Card key={app.id} className="p-0 border border-white/5 hover:border-white/10 transition-all overflow-hidden flex flex-col lg:row gap-0 bg-card-bg/30">
+                                    <div className="flex flex-col lg:flex-row">
+                                        <div className="flex-1 p-7 space-y-6">
+                                            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-6">
+                                                <div>
+                                                    <h3 className="text-2xl font-black text-white mb-2 tracking-tight">{app.candidateName}</h3>
+                                                    <div className="flex flex-wrap gap-3">
+                                                        <div className="flex items-center gap-2 px-3 py-1 bg-white/5 rounded-lg border border-white/5 text-sm text-text-dim font-medium">
+                                                            <span className="text-accent-purple">@</span> {app.candidateEmail}
+                                                        </div>
+                                                        <div className="flex items-center gap-2 px-3 py-1 bg-white/5 rounded-lg border border-white/5 text-sm text-text-dim font-medium">
+                                                            <span>📅</span> {app.createdAt?.toDate ? app.createdAt.toDate().toLocaleDateString('en-US', { day: 'numeric', month: 'short' }) : 'Recent'}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <span className={`px-5 py-2 rounded-xl text-[10px] font-black border uppercase tracking-[0.2em] shadow-sm ${getStatusColor(app.status)}`}>
+                                                    {app.status}
+                                                </span>
+                                            </div>
+
+                                            {app.message && (
+                                                <div className="bg-white/2 rounded-2xl p-6 border border-white/5 relative group/msg">
+                                                    <div className="absolute -top-3 left-6 px-4 py-0.5 bg-primary-bg border border-white/10 rounded-full text-[10px] font-black text-accent-purple uppercase tracking-[0.15em]">
+                                                        Cover Note
+                                                    </div>
+                                                    <p className="text-sm text-text-main italic leading-relaxed font-medium opacity-90">"{app.message}"</p>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <div className="lg:w-80 flex flex-col gap-3 justify-center p-7 lg:border-l border-white/5 bg-white/2 backdrop-blur-xl">
+                                            <Button
+                                                variant="secondary"
+                                                className="w-full font-black py-4 border-2 border-white/5 hover:border-white/10 group/cv"
+                                                onClick={() => window.open(app.cvUrl, '_blank')}
+                                            >
+                                                <span className="flex items-center justify-center gap-2">
+                                                    <span className="text-lg group-hover/cv:scale-110 transition-transform">📄</span>
+                                                    <span>View Full CV</span>
+                                                </span>
+                                            </Button>
+
+                                            <div className="grid grid-cols-2 gap-3 mt-2">
+                                                <button
+                                                    onClick={() => handleStatusUpdate(app.id, 'shortlisted')}
+                                                    disabled={updatingId === app.id || app.status === 'shortlisted'}
+                                                    className={`py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border-2 ${app.status === 'shortlisted'
+                                                        ? 'bg-green-500 border-green-500 text-white shadow-lg shadow-green-500/20'
+                                                        : 'bg-green-500/10 border-green-500/20 text-green-500 hover:bg-green-500 hover:text-white hover:border-green-500'
+                                                        } disabled:opacity-50`}
+                                                >
+                                                    {updatingId === app.id ? '...' : 'Shortlist'}
+                                                </button>
+                                                <button
+                                                    onClick={() => handleStatusUpdate(app.id, 'rejected')}
+                                                    disabled={updatingId === app.id || app.status === 'rejected'}
+                                                    className={`py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border-2 ${app.status === 'rejected'
+                                                        ? 'bg-red-500 border-red-500 text-white shadow-lg shadow-red-500/20'
+                                                        : 'bg-red-500/10 border-red-500/20 text-red-500 hover:bg-red-500 hover:text-white hover:border-red-500'
+                                                        } disabled:opacity-50`}
+                                                >
+                                                    {updatingId === app.id ? '...' : 'Reject'}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </Card>
+                            ))
+                        )}
                     </div>
                 )}
             </div>
