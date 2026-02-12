@@ -4,6 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
 import { getJobById } from '../../../services/jobService';
 import { applyToJob, hasAppliedToJob } from '../../../services/applicationService';
+import { getEmployerProfile } from '../../../services/employerService';
 import Card from '../../../components/common/Card';
 import Button from '../../../components/common/Button';
 import Loading from '../../../components/common/Loading';
@@ -15,6 +16,9 @@ const JobDetails = () => {
     const navigate = useNavigate();
 
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false);
+    const [companyProfile, setCompanyProfile] = useState(null);
+    const [loadingCompany, setLoadingCompany] = useState(false);
     const [cvFile, setCvFile] = useState(null);
     const [applicationForm, setApplicationForm] = useState({
         name: '',
@@ -110,6 +114,24 @@ const JobDetails = () => {
             setError(err.message || 'Failed to submit application. Please try again.');
         } finally {
             setApplying(false);
+        }
+    };
+
+    const handleViewCompanyProfile = async () => {
+        if (companyProfile) {
+            setIsCompanyModalOpen(true);
+            return;
+        }
+
+        setLoadingCompany(true);
+        try {
+            const profile = await getEmployerProfile(job.employerId);
+            setCompanyProfile(profile);
+            setIsCompanyModalOpen(true);
+        } catch (err) {
+            console.error("Failed to fetch company profile:", err);
+        } finally {
+            setLoadingCompany(false);
         }
     };
 
@@ -245,7 +267,13 @@ const JobDetails = () => {
                             <p className="text-text-dim text-sm mb-4">
                                 {job.employerName} is looking for talented individuals to join their team.
                             </p>
-                            <Button variant="secondary" size="sm" className="w-full">
+                            <Button
+                                variant="secondary"
+                                size="sm"
+                                className="w-full"
+                                onClick={handleViewCompanyProfile}
+                                loading={loadingCompany}
+                            >
                                 View Company Profile
                             </Button>
                         </Card>
@@ -365,6 +393,69 @@ const JobDetails = () => {
                         </Button>
                     </div>
                 </form>
+            </Modal>
+
+            {/* Company Profile Modal */}
+            <Modal
+                isOpen={isCompanyModalOpen}
+                onClose={() => setIsCompanyModalOpen(false)}
+                title="Company Profile"
+            >
+                {companyProfile ? (
+                    <div className="space-y-6">
+                        <div className="flex flex-col gap-1">
+                            <h2 className="text-2xl font-bold text-white">{companyProfile.companyName || job.employerName}</h2>
+                            {companyProfile.industry && (
+                                <p className="text-accent-purple font-medium uppercase tracking-wider text-xs">{companyProfile.industry}</p>
+                            )}
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {companyProfile.location && (
+                                <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+                                    <p className="text-xs text-text-dim uppercase font-bold tracking-widest mb-1">Headquarters</p>
+                                    <p className="text-white font-medium flex items-center gap-2">
+                                        <span>📍</span> {companyProfile.location}
+                                    </p>
+                                </div>
+                            )}
+                            {companyProfile.website && (
+                                <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+                                    <p className="text-xs text-text-dim uppercase font-bold tracking-widest mb-1">Official Website</p>
+                                    <a
+                                        href={companyProfile.website}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-accent-purple hover:underline font-medium flex items-center gap-2 truncate"
+                                    >
+                                        <span>🌐</span> {companyProfile.website.replace(/^https?:\/\//, '')}
+                                    </a>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="space-y-2">
+                            <p className="text-xs text-text-dim uppercase font-bold tracking-widest px-1">About the Mission</p>
+                            <div className="bg-white/5 border border-white/10 rounded-2xl p-6 text-text-dim leading-relaxed whitespace-pre-wrap">
+                                {companyProfile.description || "No company description provided."}
+                            </div>
+                        </div>
+
+                        <div className="pt-4">
+                            <Button
+                                variant="primary"
+                                className="w-full font-bold"
+                                onClick={() => setIsCompanyModalOpen(false)}
+                            >
+                                Close Overview
+                            </Button>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="text-center py-12">
+                        <p className="text-text-dim italic">Profile details are currently unavailable.</p>
+                    </div>
+                )}
             </Modal>
         </div>
     );
