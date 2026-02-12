@@ -68,42 +68,37 @@ function CandidateHome() {
         {/* Header */}
         <div>
           <h1 className="text-3xl sm:text-4xl font-bold bg-clip-text text-transparent bg-linear-to-r from-white to-text-dim mb-2">
-            Welcome, {user?.name?.split(' ')[0] || user?.email?.split('@')[0]} 👋
+            Welcome, {user?.name?.split(' ')[0] || user?.email?.split('@')[0]}
           </h1>
           <p className="text-text-dim text-lg">Here's your job search overview</p>
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card className="p-6 flex flex-col items-center justify-center text-center hover:border-white/20 transition-colors">
-            <div className="text-4xl font-bold text-white mb-2">{applications.length}</div>
-            <div className="text-text-dim text-sm font-medium uppercase tracking-wider">Total Applications</div>
-          </Card>
-          <Card className="p-6 flex flex-col items-center justify-center text-center hover:border-yellow-400/30 transition-colors group">
-            <div className="text-4xl font-bold text-yellow-400 mb-2 group-hover:scale-110 transition-transform">{statusCounts.pending}</div>
-            <div className="text-text-dim text-sm font-medium uppercase tracking-wider">Pending</div>
-          </Card>
-          <Card className="p-6 flex flex-col items-center justify-center text-center hover:border-green-400/30 transition-colors group">
-            <div className="text-4xl font-bold text-green-400 mb-2 group-hover:scale-110 transition-transform">{statusCounts.shortlisted}</div>
-            <div className="text-text-dim text-sm font-medium uppercase tracking-wider">Shortlisted</div>
-          </Card>
-          <Card className="p-6 flex flex-col items-center justify-center text-center hover:border-red-400/30 transition-colors group">
-            <div className="text-4xl font-bold text-red-400 mb-2 group-hover:scale-110 transition-transform">{statusCounts.rejected}</div>
-            <div className="text-text-dim text-sm font-medium uppercase tracking-wider">Rejected</div>
-          </Card>
-        </div>
+        {/* Changed grid-cols-1 to grid-cols-4, and reduced gap to gap-2 for mobile */}
+        <div className="grid grid-cols-4 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
 
-        {/* Quick Actions */}
-        <div className="flex flex-wrap gap-4">
-          <Button variant="primary" onClick={() => navigate('/candidate/jobs')}>
-            🔍 Browse Jobs
-          </Button>
-          {/* <Button variant="secondary" onClick={() => navigate('/candidate/profile')}>
-            👤 Edit Profile
-          </Button>
-          <Button variant="secondary" onClick={() => navigate('/candidate/applications')}>
-            📋 My Applications
-          </Button> */}
+          <Card className="p-2 sm:p-6 flex flex-col items-center justify-center text-center hover:border-white/20 transition-colors">
+            {/* text-2xl on mobile, text-4xl on larger screens */}
+            <div className="text-2xl sm:text-4xl font-bold text-white mb-1 sm:mb-2">{applications.length}</div>
+            {/* text-[10px] for very small screens to prevent text breaking */}
+            <div className="text-text-dim text-[10px] sm:text-sm font-medium uppercase tracking-wider">Total</div>
+          </Card>
+
+          <Card className="p-2 sm:p-6 flex flex-col items-center justify-center text-center hover:border-yellow-400/30 transition-colors group">
+            <div className="text-2xl sm:text-4xl font-bold text-yellow-400 mb-1 sm:mb-2 group-hover:scale-110 transition-transform">{statusCounts.pending}</div>
+            <div className="text-text-dim text-[10px] sm:text-sm font-medium uppercase tracking-wider">Pending</div>
+          </Card>
+
+          <Card className="p-2 sm:p-6 flex flex-col items-center justify-center text-center hover:border-green-400/30 transition-colors group">
+            <div className="text-2xl sm:text-4xl font-bold text-green-400 mb-1 sm:mb-2 group-hover:scale-110 transition-transform">{statusCounts.shortlisted}</div>
+            <div className="text-text-dim text-[10px] sm:text-sm font-medium uppercase tracking-wider">Shortlist</div>
+          </Card>
+
+          <Card className="p-2 sm:p-6 flex flex-col items-center justify-center text-center hover:border-red-400/30 transition-colors group">
+            <div className="text-2xl sm:text-4xl font-bold text-red-400 mb-1 sm:mb-2 group-hover:scale-110 transition-transform">{statusCounts.rejected}</div>
+            <div className="text-text-dim text-[10px] sm:text-sm font-medium uppercase tracking-wider">Rejected</div>
+          </Card>
+
         </div>
 
         {/* Recent Applications */}

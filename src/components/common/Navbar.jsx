@@ -154,27 +154,34 @@ const Navbar = () => {
 
         <div className="w-full h-px bg-white/10 my-2"></div>
 
-        {/* Inside renderNavLinks function */}
-
         <div className="flex items-center gap-4">
-          {/* 1. Added 'group' class to parent */}
+          {/* --- FIX START: Added onClick here --- */}
           <div
             className="group flex items-center gap-2 cursor-pointer transition-all"
+            onClick={() => {
+              navigate(`/${role}/profile`);
+              setIsMobileMenuOpen(false);
+            }}
           >
             <div className="w-8 h-8 rounded-full bg-accent-purple flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-accent-purple/20">
               {user.name?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase()}
             </div>
 
-            {/* 2. Removed 'hidden'. Added width and opacity transitions */}
-            <span className="text-sm text-text-main font-medium max-w-0 overflow-hidden opacity-0 group-hover:max-w-xs group-hover:opacity-100 transition-all duration-300 ease-in-out whitespace-nowrap">
+            {/* Note: I removed the opacity-0 logic for mobile so the name is always visible, 
+                which is better for mobile UX. If you prefer it hidden, add the classes back. */}
+            <span className="text-sm text-text-main font-medium">
               {user.name || user.email}
             </span>
           </div>
+          {/* --- FIX END --- */}
 
           <Button
             variant="secondary"
             size="sm"
-            onClick={handleLogout}
+            onClick={() => {
+              handleLogout();
+              setIsMobileMenuOpen(false);
+            }}
           >
             Logout
           </Button>

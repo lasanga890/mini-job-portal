@@ -74,19 +74,27 @@ const EmployerHome = () => {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-          <Card className="p-6 text-center hover:border-accent-purple/50 transition-colors">
-            <h3 className="text-4xl font-bold text-accent-purple mb-1">{stats.activeJobs}</h3>
-            <p className="text-text-dim text-sm uppercase tracking-wider font-semibold">Active Jobs</p>
+        {/* Change the outer div className to this: */}
+        {/* Changed grid-cols-1 to grid-cols-3, reduced gap to gap-2 */}
+        <div className="grid grid-cols-3 gap-2 sm:gap-6">
+
+          {/* Reduced padding from p-6 to p-2 on mobile */}
+          <Card className="p-2 sm:p-6 text-center hover:border-accent-purple/50 transition-colors">
+            <h3 className="text-2xl sm:text-4xl font-bold text-accent-purple mb-1">{stats.activeJobs}</h3>
+            {/* Smaller text size for mobile label */}
+            <p className="text-text-dim text-xs sm:text-sm uppercase tracking-wider font-semibold">Active Jobs</p>
           </Card>
-          <Card className="p-6 text-center hover:border-blue-400/50 transition-colors">
-            <h3 className="text-4xl font-bold text-blue-400 mb-1">{stats.totalApplications}</h3>
-            <p className="text-text-dim text-sm uppercase tracking-wider font-semibold">Total Applications</p>
+
+          <Card className="p-2 sm:p-6 text-center hover:border-blue-400/50 transition-colors">
+            <h3 className="text-2xl sm:text-4xl font-bold text-blue-400 mb-1">{stats.totalApplications}</h3>
+            <p className="text-text-dim text-xs sm:text-sm uppercase tracking-wider font-semibold">Applications</p>
           </Card>
-          <Card className="p-6 text-center hover:border-green-400/50 transition-colors">
-            <h3 className="text-4xl font-bold text-green-400 mb-1">{stats.shortlisted}</h3>
-            <p className="text-text-dim text-sm uppercase tracking-wider font-semibold">Shortlisted Caps</p>
+
+          <Card className="p-2 sm:p-6 text-center hover:border-green-400/50 transition-colors">
+            <h3 className="text-2xl sm:text-4xl font-bold text-green-400 mb-1">{stats.shortlisted}</h3>
+            <p className="text-text-dim text-xs sm:text-sm uppercase tracking-wider font-semibold">Shortlisted</p>
           </Card>
+
         </div>
 
 
