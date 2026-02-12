@@ -138,7 +138,7 @@ function CandidateHome() {
           <h2 className="text-2xl font-bold text-white">Latest Openings</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {recentJobs.map(job => (
-              <div key={job.id} onClick={() => navigate(`/jobs/${job.id}`)} className="cursor-pointer">
+              <div key={job.id} onClick={() => navigate(`../job/${job.id}`)} className="cursor-pointer h-full">
                 <JobCard job={job} />
               </div>
             ))}

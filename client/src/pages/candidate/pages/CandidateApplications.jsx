@@ -68,8 +68,8 @@ function CandidateApplications() {
             <button
               key={s}
               className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 border ${filter === s
-                  ? 'bg-accent-purple text-white border-accent-purple shadow-lg shadow-accent-purple/20'
-                  : 'bg-white/5 text-text-dim border-white/10 hover:bg-white/10 hover:text-white'
+                ? 'bg-accent-purple text-white border-accent-purple shadow-lg shadow-accent-purple/20'
+                : 'bg-white/5 text-text-dim border-white/10 hover:bg-white/10 hover:text-white'
                 }`}
               onClick={() => setFilter(s)}>
               {s.charAt(0).toUpperCase() + s.slice(1)}
@@ -102,7 +102,7 @@ function CandidateApplications() {
                   <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-4">
                     <div>
                       <div
-                        onClick={() => navigate(`/jobs/${app.jobId || app.job?._id}`)}
+                        onClick={() => navigate(`../job/${app.jobId || app.job?._id}`)}
                         className="group cursor-pointer"
                       >
                         <h3 className="text-xl font-bold text-white group-hover:text-accent-purple transition-colors">

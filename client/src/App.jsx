@@ -7,6 +7,7 @@ import CandidateDashboard from './pages/candidate/CandidateDashboard.jsx'
 import CandidateHome from './pages/candidate/pages/CandidateHome.jsx'
 import CandidateApplications from './pages/candidate/pages/CandidateApplications.jsx'
 import CandidateProfile from './pages/candidate/pages/CandidateProfile.jsx'
+import JobDetails from './pages/candidate/pages/JobDetails.jsx'
 import EmployerDashboard from './pages/employer/EmployerDashboard.jsx'
 import EmployerHome from './pages/employer/pages/EmployerHome.jsx'
 import JobPost from './pages/employer/pages/JobPost.jsx'
@@ -37,6 +38,7 @@ function App() {
           <Route path="home" element={<CandidateHome />} />
           <Route path="applications" element={<CandidateApplications />} />
           <Route path="profile" element={<CandidateProfile />} />
+          <Route path="job/:jobId" element={<JobDetails />} />
         </Route>
         <Route
           path="/employer/*"

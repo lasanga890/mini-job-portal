@@ -62,10 +62,13 @@ export const uploadCV = async (uid, file) => {
     
     const downloadURL = await getDownloadURL(storageRef);
     
-    // Also update the user document with the new CV URL automatically
-    await updateCandidateProfile(uid, { cvUrl: downloadURL });
+    // Also update the user document with the new CV URL and Name automatically
+    await updateCandidateProfile(uid, { 
+      cvUrl: downloadURL,
+      cvName: file.name
+    });
     
-    return downloadURL;
+    return { url: downloadURL, name: file.name };
   } catch (error) {
     console.error("Firebase Storage Error:", error);
     if (error.code === 'storage/unauthorized') {
