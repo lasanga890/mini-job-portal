@@ -14,7 +14,8 @@ import JobPost from './pages/employer/pages/JobPost.jsx'
 import MyJobs from './pages/employer/pages/MyJobs.jsx'
 import EmployerProfile from './pages/employer/pages/EmployerProfile.jsx'
 import EmployerApplications from './pages/employer/pages/EmployerApplications.jsx'
-import AdminDashboard from './pages/AdminDashboard.jsx'
+import AdminDashboard from './pages/admin/AdminDashboard.jsx'
+import AdminJobs from './pages/admin/pages/AdminJobs.jsx'
 
 import ProtectedRoute from './routes/ProtectedRoute.jsx'
 
@@ -58,13 +59,16 @@ function App() {
           <Route path="applications" element={<EmployerApplications />} />
         </Route>
         <Route
-          path="/admin"
+          path="/admin/*"
           element={
             <ProtectedRoute allowedRole="admin">
               <AdminDashboard />
             </ProtectedRoute>
           }
-        />
+        >
+          <Route index element={<Navigate to="jobs" replace />} />
+          <Route path="jobs" element={<AdminJobs />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   )
