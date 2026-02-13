@@ -125,8 +125,8 @@ Use these accounts to test the different role-based features:
 | Account Role | Email | Password |
 |-------------|-------|----------|
 | **System Admin** | `admin@gmail.com` | `Admin@123` |
-| **Verified Employer** | `employer@test.com` | `password@123` |
-| **Job Candidate** | `candidate@test.com` | `password@123` |
+| **Verified Employer** | `employer@test.com` | `Password@123` |
+| **Job Candidate** | `candidate@test.com` | `Password@123` |
 
 ---
 
