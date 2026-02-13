@@ -1,11 +1,7 @@
-import { Outlet, useNavigate, useLocation } from 'react-router-dom'
+import { Outlet } from 'react-router-dom'
 import Navbar from '../../components/common/Navbar'
 
 function AdminDashboard() {
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  const isJobsPage = location.pathname === '/admin/jobs' || location.pathname === '/admin';
 
   return (
     <>

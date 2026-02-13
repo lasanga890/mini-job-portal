@@ -35,6 +35,14 @@ function CandidateApplications() {
     loadApps();
   }, [user, authLoading, navigate]);
 
+  const handleOpenCv = (cvUrl) => {
+    if (!cvUrl) {
+      alert('CV link not available for this application.');
+      return;
+    }
+    window.open(cvUrl, '_blank');
+  };
+
   if (authLoading || loading) {
     return <Loading />;
   }
@@ -135,7 +143,7 @@ function CandidateApplications() {
                         variant="secondary"
                         size="sm"
                         className="py-1.5! px-3! text-xs! font-bold"
-                        onClick={() => window.open(app.cvUrl, '_blank')}
+                        onClick={() => handleOpenCv(app.cvUrl)}
                       >
                         📄 View CV
                       </Button>

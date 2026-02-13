@@ -66,20 +66,20 @@ const CandidateProfile = () => {
         try {
             let currentCvUrl = cvUrl; // Use current state cvUrl
 
-            // 1. If a new CV file is selected, upload it first
+            // 1. If a new CV file is selected, upload it to profile location
             if (cvFile) {
                 try {
                     const uploadRes = await uploadCV(user.uid, cvFile);
                     currentCvUrl = uploadRes.url;
-                    setCvUrl(currentCvUrl); // Update local state
+                    setCvUrl(currentCvUrl);
                     setCvName(uploadRes.name);
-                    setCvFile(null); // Clear file selection
+                    setCvFile(null);
                 } catch (uploadErr) {
                     throw new Error(`CV Upload failed: ${uploadErr.message}`);
                 }
             }
 
-            // 2. Update profile with details and (potentially new) CV URL
+            // 2. Update profile with details and CV URL (profile location only)
             const data = {
                 ...form,
                 skills: form.skills.split(',').map(s => s.trim()).filter(Boolean),

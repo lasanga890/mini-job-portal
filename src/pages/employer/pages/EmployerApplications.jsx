@@ -1,15 +1,13 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../context/AuthContext';
 import { getEmployerJobs } from '../../../services/jobService';
-// 1. IMPORT THE NEW FUNCTION HERE
-import { getFreshCvUrl } from '../../../services/applicationService';
 import useEmployerApplications from '../../../hooks/useEmployerApplications';
 import Card from '../../../components/common/Card';
 import Button from '../../../components/common/Button';
 import Loading from '../../../components/common/Loading';
 
 const EmployerApplications = () => {
-    // ... (Keep existing state and useEffects exactly as they are) ...
     const { user, loading: authLoading } = useAuth();
     const [jobs, setJobs] = useState([]);
     const [jobsLoading, setJobsLoading] = useState(true);
@@ -35,17 +33,6 @@ const EmployerApplications = () => {
         }
     }, [user, authLoading]);
 
-    // 2. ADD THIS NEW HANDLER FUNCTION
-    const handleViewResume = async (candidateId) => {
-        try {
-            // This gets a brand new token from Firebase
-            const freshUrl = await getFreshCvUrl(candidateId);
-            window.open(freshUrl, '_blank');
-        } catch (error) {
-            alert("Unable to open CV. The file may be missing or access is denied.");
-            console.error(error);
-        }
-    };
 
     const getStatusColor = (status) => {
         switch (status) {
@@ -56,19 +43,30 @@ const EmployerApplications = () => {
         }
     };
 
+    const handleOpenCv = (cvUrl) => {
+        if (!cvUrl) {
+            alert('CV link not available for this application.');
+            return;
+        }
+        window.open(cvUrl, '_blank');
+    };
+
     if (authLoading || appsLoading || jobsLoading) return <Loading />;
 
-    // ... (Keep jobGroups logic exactly as is) ...
+    // Initialize jobGroups with all jobs
     const jobGroups = {};
     jobs.forEach(job => {
         jobGroups[job.id] = { title: job.title, apps: [] };
     });
 
+    // Populate jobGroups with applications
     applications.forEach(app => {
         const jobId = app.jobId;
         if (jobGroups[jobId]) {
             jobGroups[jobId].apps.push(app);
         } else {
+            // Handle applications for jobs that might not be in the employer's current jobs list 
+            // (though this shouldn't happen based on user.uid fetch)
             if (!jobGroups[jobId || 'general']) {
                 jobGroups[jobId || 'general'] = { title: app.jobTitle || 'General Application', apps: [] };
             }
@@ -85,12 +83,10 @@ const EmployerApplications = () => {
     return (
         <div className="min-h-screen bg-primary-bg pt-24 px-4 sm:px-6 lg:px-8 font-sans text-text-main pb-12">
             <div className="max-w-7xl mx-auto space-y-8">
-                {/* ... (Keep Header Section and Job Summary Cards exactly as is) ... */}
 
-                {/* Header Section Code Omitted for brevity - Keep it the same */}
+                {/* Header Section */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div className="flex-1">
-                        {/* ... Header content ... */}
                         <div className="flex items-center gap-4 mb-3">
                             {selectedJobId && (
                                 <button
@@ -112,7 +108,7 @@ const EmployerApplications = () => {
                                 : 'Select a job to manage incoming candidate applications'}
                         </p>
                     </div>
-                    {/* ... Filter buttons ... */}
+
                     {selectedJobId && (
                         <div className="flex gap-2 flex-wrap bg-white/5 p-1.5 rounded-2xl border border-white/5">
                             {['all', 'pending', 'shortlisted', 'rejected'].map(s => (
@@ -132,9 +128,8 @@ const EmployerApplications = () => {
                 </div>
 
                 {jobs.length === 0 ? (
-                    /* ... No Jobs View ... */
                     <div className="text-center py-20 bg-card-bg/50 rounded-3xl border border-white/5 backdrop-blur-sm">
-                        <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl"></div>
+                        <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl">�</div>
                         <h3 className="text-2xl font-bold text-white mb-2">No jobs posted yet</h3>
                         <p className="text-text-dim max-w-md mx-auto">Once you post a job, it will appear here for you to manage incoming applications.</p>
                         <Button
@@ -146,11 +141,10 @@ const EmployerApplications = () => {
                         </Button>
                     </div>
                 ) : !selectedJobId ? (
-                    /* ... Dashboard Cards View ... */
+                    /* Dashboard View: Job Summaries */
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-700">
                         {Object.entries(jobGroups).map(([jobId, { title, apps }]) => (
                             <Card key={jobId} className="p-7 border border-white/5 hover:border-accent-purple/30 transition-all group relative overflow-hidden flex flex-col bg-card-bg/40 backdrop-blur-md">
-                                {/* ... Card content ... */}
                                 <div className="absolute -top-6 -right-6 w-24 h-24 bg-accent-purple/10 blur-3xl rounded-full group-hover:bg-accent-purple/20 transition-all duration-500" />
 
                                 <h3 className="text-xl font-bold text-white mb-6 pr-4 line-clamp-2 min-h-[3.5rem] group-hover:text-accent-purple transition-colors">{title}</h3>
@@ -191,7 +185,7 @@ const EmployerApplications = () => {
                         ))}
                     </div>
                 ) : (
-                    /* Detailed View */
+                    /* Detailed View: Candidate List */
                     <div className="space-y-6 animate-in slide-in-from-bottom-6 fade-in duration-700">
                         {filteredApps.length === 0 ? (
                             <div className="text-center py-20 bg-white/2 rounded-3xl border border-dashed border-white/10">
@@ -203,7 +197,6 @@ const EmployerApplications = () => {
                                 <Card key={app.id} className="p-0 border border-white/5 hover:border-white/10 transition-all overflow-hidden flex flex-col lg:row gap-0 bg-card-bg/30">
                                     <div className="flex flex-col lg:flex-row">
                                         <div className="flex-1 p-7 space-y-6">
-                                            {/* ... (Keep candidate info exactly as is) ... */}
                                             <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-6">
                                                 <div>
                                                     <h3 className="text-2xl font-black text-white mb-2 tracking-tight">{app.candidateName}</h3>
@@ -232,11 +225,10 @@ const EmployerApplications = () => {
                                         </div>
 
                                         <div className="lg:w-80 flex flex-col gap-3 justify-center p-7 lg:border-l border-white/5 bg-white/2 backdrop-blur-xl">
-                                            {/* 3. UPDATED BUTTON: Calls handleViewResume with candidateId */}
                                             <Button
                                                 variant="secondary"
                                                 className="w-full font-black py-4 border-2 border-white/5 hover:border-white/10 group/cv"
-                                                onClick={() => handleViewResume(app.candidateId)}
+                                                onClick={() => handleOpenCv(app.cvUrl)}
                                             >
                                                 <span className="flex items-center justify-center gap-2">
                                                     <span className="text-lg group-hover/cv:scale-110 transition-transform">📄</span>
@@ -244,7 +236,6 @@ const EmployerApplications = () => {
                                                 </span>
                                             </Button>
 
-                                            {/* ... (Keep Status Update buttons exactly as is) ... */}
                                             <div className="grid grid-cols-2 gap-3 mt-2">
                                                 <button
                                                     onClick={() => updateStatus(app.id, 'shortlisted')}

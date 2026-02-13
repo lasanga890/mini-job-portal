@@ -81,20 +81,27 @@ const JobDetails = () => {
         setSuccess('');
 
         try {
-            let finalCvUrl = user.cvUrl;
-
-            // 1. If a new CV file is selected, upload it first
+            // Step 1: Create application first to get its ID for storage path
+            let applicationId;
+            
+            // Step 2: Prepare CV for this application
+            let finalCvUrl = null;
+            
             if (cvFile) {
-                try {
-                    const { uploadCV } = await import('../../../services/candidateService');
-                    finalCvUrl = await uploadCV(user.uid, cvFile);
-                } catch (uploadErr) {
-                    throw new Error(`CV Upload failed: ${uploadErr.message}`);
-                }
+                // User uploading a new CV for this application
+                // We'll upload after creating the application to get its ID
+            } else if (!user.cvUrl) {
+                // User has no existing CV and didn't provide one
+                setError('Please upload your CV before applying.');
+                setApplying(false);
+                return;
+            } else {
+                // Use existing profile CV
+                finalCvUrl = user.cvUrl;
             }
 
-            // 2. Submit application
-            await applyToJob({
+            // Step 3: Create the application document (gets an ID)
+            const appData = {
                 jobId,
                 candidateId: user.uid,
                 candidateName: applicationForm.name,
@@ -103,8 +110,27 @@ const JobDetails = () => {
                 jobTitle: job.title,
                 employerId: job.employerId,
                 employerName: job.employerName || 'Company',
-                cvUrl: finalCvUrl,
-            });
+                cvUrl: finalCvUrl, // Will be updated if new CV uploaded
+                status: 'pending',
+            };
+
+            applicationId = await applyToJob(appData);
+
+            // Step 4: If new CV was selected, upload it to applications/{applicationId}/
+            if (cvFile) {
+                try {
+                    const { uploadApplicationCV } = await import('../../../services/candidateService');
+                    const uploadRes = await uploadApplicationCV(applicationId, user.uid, cvFile);
+                    finalCvUrl = uploadRes.url;
+
+                    // Update the application document with the new CV URL
+                    const { doc, updateDoc } = await import('firebase/firestore');
+                    const { db } = await import('../../../firebase/firebaseConfig');
+                    await updateDoc(doc(db, 'applications', applicationId), { cvUrl: finalCvUrl });
+                } catch (uploadErr) {
+                    throw new Error(`CV Upload for application failed: ${uploadErr.message}`);
+                }
+            }
 
             setSuccess('Application submitted successfully!');
             setApplied(true);
@@ -154,6 +180,12 @@ const JobDetails = () => {
     return (
         <div className="min-h-screen bg-primary-bg pt-24 px-4 sm:px-6 lg:px-8 font-sans text-text-main pb-12">
             <div className="max-w-4xl mx-auto space-y-8">
+                {success && (
+                    <div className="bg-green-500/10 border border-green-500/20 text-green-500 px-4 py-3 rounded-xl flex items-center gap-2 animate-in fade-in slide-in-from-top-4">
+                        <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                        <span className="text-sm font-medium">{success}</span>
+                    </div>
+                )}
                 <JobDetailsView
                     job={job}
                     applied={applied}
