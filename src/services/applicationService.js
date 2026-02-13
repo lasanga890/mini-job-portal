@@ -11,6 +11,7 @@ import {
   doc,
   serverTimestamp 
 } from "firebase/firestore";
+const storage = getStorage();
 
 const APPLICATIONS_COLLECTION = "applications";
 
@@ -92,6 +93,17 @@ export const updateApplicationStatus = async (applicationId, status) => {
     return true;
   } catch (error) {
     console.error("Error updating application status:", error);
+    throw error;
+  }
+};
+export const getFreshCvUrl = async (candidateId) => {
+  try {
+    // This must match the path in your Storage: cvs/{userId}/resume.pdf
+    const cvRef = ref(storage, `cvs/${candidateId}/resume.pdf`);
+    const url = await getDownloadURL(cvRef);
+    return url;
+  } catch (error) {
+    console.error("Error generating fresh CV URL:", error);
     throw error;
   }
 };
