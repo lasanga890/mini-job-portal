@@ -8,10 +8,10 @@ const Footer = () => {
         <div className="text-center md:text-left">
           <span className="text-2xl font-bold text-white">JobPortal</span>
           <p className="mt-2 text-sm text-text-dim">
-            &copy; {new Date().getFullYear()} JobPortal. All rights reserved.
+            &copy; {new Date().getFullYear()} Lasanga Dissanayaka. All rights reserved.
           </p>
         </div>
-        
+
         <div className="flex gap-8 text-sm text-text-dim">
           <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
           <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
