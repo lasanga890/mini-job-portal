@@ -42,13 +42,15 @@ const HeroSection = ({ onFilter, jobTypes, locations }) => {
 
         {/* Search and Filter Section */}
         <div className="bg-card-bg/40 backdrop-blur-xl border border-white/10 rounded-2xl p-6 sm:p-8 animate-slide-up" style={{ animationDelay: '0.2s' }}>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {/* Keyword Search */}
+          {/* Changed grid-cols to 5 on large screens */}
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+
+            {/* Keyword Search - Spans 2 columns */}
             <div className="md:col-span-2">
               <label className="block text-sm font-semibold text-text-dim mb-2">Job Title or Keyword</label>
               <input
                 type="text"
-                placeholder="Frontend Developer, Designer, etc..."
+                placeholder="Frontend Developer..."
                 value={keyword}
                 onChange={handleInputChange}
                 onKeyPress={handleKeyPress}
@@ -66,9 +68,7 @@ const HeroSection = ({ onFilter, jobTypes, locations }) => {
               >
                 <option value="" className="text-black">All Locations</option>
                 {locations.map(location => (
-                  <option key={location} value={location} className="text-black">
-                    {location}
-                  </option>
+                  <option key={location} value={location} className="text-black">{location}</option>
                 ))}
               </select>
             </div>
@@ -83,21 +83,21 @@ const HeroSection = ({ onFilter, jobTypes, locations }) => {
               >
                 <option value="" className="text-black">All Types</option>
                 {jobTypes.map(type => (
-                  <option key={type} value={type} className="text-black">
-                    {type}
-                  </option>
+                  <option key={type} value={type} className="text-black">{type}</option>
                 ))}
               </select>
             </div>
-          </div>
 
-          {/* Search Button */}
-          <button
-            onClick={handleSearch}
-            className="w-full mt-4 px-6 py-3 bg-accent-gradient text-white font-bold rounded-xl hover:opacity-90 transition-all transform active:scale-[0.98] focus:outline-none"
-          >
-            Search Jobs
-          </button>
+            {/* Search Button - Now inside the grid div */}
+            <div>
+              <button
+                onClick={handleSearch}
+                className="w-full px-6 py-3 bg-accent-gradient text-white font-bold rounded-xl hover:opacity-90 transition-all transform active:scale-[0.98] focus:outline-none h-[50px]"
+              >
+                Search
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
